@@ -1,0 +1,46 @@
+{
+  "directories": {
+    "buildResources": "assets"
+  },
+  "extraMetadata": {
+    "main": "electron/main.js"
+  },
+  "extends": null,
+  "appId": "io.g1eny0ung.electron-typescript-react-boilerplate",
+  "mac": {
+    "category": "public.app-category.developer-tools",
+    "target": "dmg"
+  },
+  "dmg": {
+    "contents": [
+      {
+        "x": 140,
+        "y": 220
+      },
+      {
+        "x": 400,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    }
+  },
+  "win": {
+    "target": "nsis"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  },
+  "linux": {
+    "category": "Development",
+    "target": ["deb", "tar.gz"]
+  }
+}
