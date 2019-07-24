@@ -1,11 +1,10 @@
 echo "Start building..."
 
-# yarn build
+# npm build
 if [[ ! -e app/build/index.html ]]
 then
     echo "There is no index.html, run script:"
-    echo "--- yarn build ---"
-    yarn build
+    npm run build
 fi
 
 # copy build files to app
@@ -16,7 +15,7 @@ cp -r electron app/electron
 
 # yarn dist:electron
 echo "Cooking App... ^_^"
-yarn dist:electron
+npm run electron:dist
 
 # clear app/
 rm -rv app/build

@@ -1,7 +1,17 @@
 {
   "name": "web-screenshot-app",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "main": "electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "electron:start": "cross-env NODE_ENV=development electron .",
+    "electron:dist": "electron-builder"
+  },
   "dependencies": {
     "@types/jest": "24.0.15",
     "@types/node": "12.6.8",
@@ -12,16 +22,19 @@
     "react-scripts": "3.0.1",
     "typescript": "3.5.3"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start:electron": "cross-env NODE_ENV=development electron .",
-    "dist:electron": "electron-builder"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^1.13.0",
+    "@typescript-eslint/parser": "^1.13.0",
+    "cross-env": "^5.2.0",
+    "electron": "^5.0.7",
+    "electron-builder": "^21.1.1",
+    "electron-devtools-installer": "^2.2.4",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-react": "^7.14.3",
+    "node-sass": "^4.12.0",
+    "prettier": "^1.18.2"
   },
   "browserslist": {
     "production": [
@@ -34,16 +47,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "main": "electron/main.js",
-  "homepage": "./",
-  "devDependencies": {
-    "cross-env": "^5.2.0",
-    "electron": "^5.0.1",
-    "electron-builder": "^20.39.0",
-    "electron-devtools-installer": "^2.2.4",
-    "tslint": "^5.16.0",
-    "tslint-react": "^4.0.0",
-    "node-sass": "^4.12.0"
   }
 }

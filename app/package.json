@@ -1,8 +1,5 @@
 {
-  "name": "electron-typescript-react-boilerplate",
+  "name": "web-screenshot-app",
   "version": "1.0.0",
-  "description":
-    "Build cross platform desktop apps with electron, typescript, react and much more powerful tools with scalable configurations",
-  "author": "Yue Yang <g1enyy0ung@gmail.com> (http://g1eny0ung.site)",
   "private": true
 }
