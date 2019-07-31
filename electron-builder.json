@@ -1,9 +1,9 @@
 {
   "directories": {
-    "buildResources": "assets"
+    "buildResources": "buildResources"
   },
   "extraMetadata": {
-    "main": "electron/main.js"
+    "main": "main.js"
   },
   "extends": null,
   "appId": "com.swarmnyc.web-screenshot-app",

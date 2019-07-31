@@ -1,3 +1,4 @@
+const url = require("url")
 const path = require("path")
 const { BrowserWindow } = require("electron")
 
@@ -7,7 +8,13 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1024,
     height: 768,
-    show: false
+    minWidth: 800,
+    minHeight: 600,
+    show: false,
+    webPreferences: {
+      webviewTag: true,
+      nodeIntegration: true
+    }
   })
 
   if (process.env.NODE_ENV === "development") {
@@ -15,7 +22,13 @@ function createWindow() {
 
     mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(path.join(__dirname, "../build/index.html"))
+    mainWindow.loadURL(
+      url.format({
+        pathname: path.join(__dirname, "src/index.html"),
+        protocol: "file:",
+        slashes: true
+      })
+    )
   }
 
   mainWindow.once("ready-to-show", () => {

@@ -10,6 +10,8 @@
 
 # production
 /build
+/app/src
+/settings
 
 # misc
 .DS_Store
