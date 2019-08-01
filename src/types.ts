@@ -15,6 +15,6 @@ export interface Page {
   name: string
   url: string
   resultUrl?: string
-  resultId?: string
-  resultVersionId?: string
+  resultId?: number
+  resultVersionId?: number
 }
