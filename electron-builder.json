@@ -7,7 +7,7 @@
   },
   "extends": null,
   "appId": "com.swarmnyc.web-screenshot-app",
-  "productName": "CBT Screenhsot App",
+  "productName": "CBT Screenshot App",
   "mac": {
     "category": "public.app-category.developer-tools",
     "target": "dmg"

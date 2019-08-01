@@ -11,6 +11,7 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     show: false,
+    title: "CBT Screenshot App",
     webPreferences: {
       webviewTag: true,
       nodeIntegration: true
