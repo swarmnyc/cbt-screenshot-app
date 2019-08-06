@@ -11,10 +11,8 @@ node_modules
 
 
 # misc
-/dist
-/build
-/app/src
-/temp
+dist
+build
 
 .DS_Store
 .env

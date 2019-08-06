@@ -1,0 +1,12 @@
+{
+  "name": "cbt-screenshot-common",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./build/index.js",
+  "types": "./index.ts",
+  "scripts": {
+    "postinstall": "tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

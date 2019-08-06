@@ -1,0 +1,51 @@
+{
+  "appId": "com.swarmnyc.web-screenshot-app",
+  "productName": "CBT Screenshot App",
+  "directories": {
+    "buildResources": "assets"
+  },
+  "extraMetadata": {
+    "main": "main.ts"
+  },
+  "files": [
+    {
+      "from": "./build",
+      "to": "./"
+    },
+    {
+      "from": "../react/build",
+      "to": "./client"
+    },
+    "package.json"
+  ],
+  "mac": {
+    "category": "public.app-category.developer-tools",
+    "target": "dmg"
+  },
+  "dmg": {
+    "sign": false,
+    "contents": [
+      {
+        "x": 140,
+        "y": 220
+      },
+      {
+        "x": 400,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    }
+  },
+  "win": {
+    "target": "zip"
+  },
+  "linux": {
+    "category": "Development",
+    "target": ["deb", "tar.gz"]
+  }
+}
