@@ -1,57 +1,94 @@
 import React from "react"
-import { Page } from "../types"
-
-interface Props {
-  page?: Page
-}
-
-interface State {
-  name?: string
-  resultUrl?: string
-}
+import { Page, LoadStatus, Project, PageView, CbtScreenshot, CbtScreenshotVersion } from "cbt-screenshot-common"
+import cbtApiService from "services/cbt-api-service"
+import Loading from "./loading"
+import Error from "./error"
+import { Box, Typography } from "@material-ui/core"
 
 const UserAgent = "Mozilla/5.0"
 
-export default class HomeRight extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
+interface Props {
+  project: Project
+  page: PageView
+}
 
-    this.state = this.getPageState(this.props.page)
+interface State {
+  status: LoadStatus
+  screenshot?: CbtScreenshot
+  screenshotVersion?: CbtScreenshotVersion
+}
+
+export default class HomeRight extends React.Component<Props, State> {
+  state: State = { status: LoadStatus.Loading }
+
+  componentWillMount(): void {
+    this.fetchCbtScreenshot(this.props.project, this.props.page)
   }
 
   componentWillReceiveProps(nextProps: Readonly<Props>): void {
     if (this.props.page != nextProps.page) {
-      this.setState(this.getPageState(nextProps.page))
+      this.setState({ status: LoadStatus.Loading })
+      this.fetchCbtScreenshot(nextProps.project, nextProps.page)
     }
   }
 
   render(): React.ReactElement {
-    console.log("render")
+    switch (this.state.status) {
+      case LoadStatus.Loading:
+        return <Loading />
+      case LoadStatus.Error:
+        return <Error />
+    }
+
     if (this.props.page) {
-      return (
-        <>
-          {this.state.resultUrl && (
-            <webview src={this.state.resultUrl} style={{ width: "100%", height: "100%" }} useragent={UserAgent} />
-          )}
-          {!this.state.resultUrl && <h5 className="m-2">{this.props.page.name} has no screenshot.</h5>}
-        </>
-      )
+      if (this.state.screenshotVersion) {
+        var { show_results_public_url: resultUrl } = this.state.screenshotVersion
+        resultUrl += "?size=small&type=fullpage"
+        return <webview src={resultUrl} style={{ width: "100%", height: "100%" }} useragent={UserAgent} />
+      } else {
+        return (
+          <Box className="screen-center">
+            <Typography variant="h5">This page has no screenshot.</Typography>
+          </Box>
+        )
+      }
     } else {
-      return <h1 className="m-5">Place select a page.</h1>
+      return (
+        <Box className="screen-center">
+          <Typography variant="h5">Place select a page on the left side.</Typography>
+        </Box>
+      )
     }
   }
 
-  getPageState(page: Page): State {
-    if (page) {
-      return {
-        name: page.name,
-        resultUrl: page.resultUrl ? `${page.resultUrl}?size=small&type=fullpage` : null
-      }
-    } else {
-      return {
-        name: null,
-        resultUrl: null
-      }
+  fetchCbtScreenshot(project: Project, page: PageView): void {
+    if (page == null || !page.resultId) {
+      this.setState({ status: LoadStatus.Loaded, screenshot: null, screenshotVersion: null })
+      return
     }
+
+    if (page.screenshot != null) {
+      this.setState({
+        status: LoadStatus.Loaded,
+        screenshot: page.screenshot,
+        screenshotVersion: page.screenshot.versions[page.screenshot.versions.length - 1]
+      })
+      return
+    }
+
+    cbtApiService
+      .getScreenshot(project, page)
+      .then(screenshot => {
+        page.screenshot = screenshot
+        this.setState({
+          status: LoadStatus.Loaded,
+          screenshot,
+          screenshotVersion: screenshot.versions[screenshot.versions.length - 1]
+        })
+      })
+      .catch(error => {
+        this.setState({ status: LoadStatus.Error })
+        console.error("Fetch CBT Page Failed", error)
+      })
   }
 }

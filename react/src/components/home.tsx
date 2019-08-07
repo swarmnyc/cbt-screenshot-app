@@ -1,15 +1,13 @@
-import { AppBar, IconButton, NativeSelect, Toolbar, Typography } from "@material-ui/core"
+import { AppBar, IconButton, NativeSelect, Toolbar, Typography, Box } from "@material-ui/core"
 import { PresentToAll, Settings } from "@material-ui/icons"
+import { Page, Project } from "cbt-screenshot-common"
 import React from "react"
 import SplitPane from "react-split-pane"
-import SettingService from "services/setting-service"
-import { Page, Project } from "../types"
+import dataCache from "services/data-cache"
 import HomeLeft from "./home-left"
 import HomeRight from "./home-right"
-import Swal from "sweetalert2"
 
 interface State {
-  projects?: Project[]
   project?: Project
   page?: Page
 }
@@ -18,48 +16,45 @@ export default class Home extends React.Component<{}, State> {
   constructor(props: {}) {
     super(props)
 
-    var projects = SettingService.getProjects()
-    this.state = { projects, project: projects[0] }
+    this.state = { project: dataCache.projectArray[0] }
   }
 
   render(): React.ReactElement {
-    var { page } = this.state
+    var projects = dataCache.projectArray
+    var { page, project } = this.state
 
     return (
       <>
         <AppBar position="static">
-          <Toolbar variant="dense">
-            <Typography variant="h6" className="flex-grow">
-              CBT Screenshot App
-            </Typography>
-
-            <Typography>Projects:</Typography>
-            <NativeSelect value={this.state.project.id} onChange={this.onProjectSelected} className="m-2 light">
-              {this.state.projects.map(p => (
-                <option key={p.id} value={p.id}>
+          <Toolbar variant="dense" disableGutters={true}>
+            <Typography className="mx-2">Project:</Typography>
+            <NativeSelect value={project._id} onChange={this.onProjectSelected} className="light">
+              {projects.map(p => (
+                <option key={p._id} value={p._id}>
                   {p.name}
                 </option>
               ))}
             </NativeSelect>
+            <Box className="flex-grow" />
 
             <IconButton title="Task Screenshots" color="inherit" onClick={() => {}}>
               <PresentToAll />
             </IconButton>
-            <IconButton edge="end" title="Settings" color="inherit">
+            <IconButton title="Settings" color="inherit">
               <Settings />
             </IconButton>
           </Toolbar>
         </AppBar>
         <SplitPane split="vertical" minSize={200} defaultSize={300} maxSize={500} style={{ height: "" }}>
-          <HomeLeft project={this.state.project} onPageSelected={this.onPageSelected} />
-          <HomeRight page={page} />
+          <HomeLeft project={project} onPageSelected={this.onPageSelected} />
+          <HomeRight project={project} page={page} />
         </SplitPane>
       </>
     )
   }
 
   onProjectSelected = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-    this.setState({ project: SettingService.getProject(event.target.value), page: null })
+    this.setState({ project: dataCache.projectMap.get(event.target.value), page: null })
   }
 
   onPageSelected = (page: Page): void => {

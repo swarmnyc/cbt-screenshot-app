@@ -1,8 +1,10 @@
 import url from "url"
 import path from "path"
 import { BrowserWindow } from "electron"
+import { IpcServer } from "./services/ipc-server"
 
-let mainWindow: BrowserWindow = null
+let mainWindow: BrowserWindow
+let ipcServer: IpcServer
 
 export function createWindow() {
   mainWindow = new BrowserWindow({
@@ -17,6 +19,8 @@ export function createWindow() {
       nodeIntegration: true
     }
   })
+
+  ipcServer = new IpcServer(mainWindow)
 
   if (process.env.NODE_ENV === "development") {
     mainWindow.loadURL("http://localhost:3000")

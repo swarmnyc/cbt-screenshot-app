@@ -2,11 +2,12 @@
   "name": "cbt-screenshot-app",
   "version": "1.1.0",
   "private": true,
-  "main": "./build/main.js",
+  "main": "./src/main.ts",
   "scripts": {
+    "tsc": "tsc",
     "update:common": "npm install --no-audit ../common",
-    "prestart": "npm run update:common && rimraf build && tsc",
-    "start": "cross-env NODE_ENV=development electron .",
+    "start": "cross-env NODE_ENV=development electron --require ts-node/register .",
+    "start:with-common": "npm run update:common && npm run start",
     "prebuild": "npm run update:common && rimraf build && tsc",
     "build": "electron-builder"
   },
@@ -28,6 +29,7 @@
     "node-sass": "^4.12.0",
     "prettier": "^1.18.2",
     "rimraf": "^2.6.3",
+    "ts-node": "^8.3.0",
     "typescript": "3.5.3"
   }
 }

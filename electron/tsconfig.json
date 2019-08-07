@@ -17,5 +17,5 @@
     "strictNullChecks": false,
     "target": "es6"
   },
-  "include": ["src", "types.d.ts"]
+  "include": ["src"]
 }

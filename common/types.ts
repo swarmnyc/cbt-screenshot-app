@@ -1,4 +1,4 @@
-declare type ObjectId = any
+export declare type ObjectId = any
 
 export enum ConnChannels {
   Initialize = "Initialize",
@@ -6,15 +6,20 @@ export enum ConnChannels {
   OpenSettings = "OpenSettings"
 }
 
-export interface Project {
-  id: string
-  name: string
-  config: Config
-  pages: Page[]
+export enum LoadStatus {
+  Loading,
+  Loaded,
+  Error
+}
+
+export enum InitStatus {
+  initializing,
+  initialized,
+  error
 }
 
 export interface Project {
-  _id: ObjectId
+  _id: ObjectId | string
   name: string
   domain: string
   authName: string
@@ -23,16 +28,17 @@ export interface Project {
   mobileBrowsers: string[]
 }
 
-export interface Config {
-  username: string
-  password: string
-  browsers: string[]
+export interface Page {
+  _id: ObjectId | string
+  projectId: ObjectId | string
+  name: string
+  path: string
+  folder?: string
+  resultId?: number
 }
 
-export interface Page {
-  name: string
-  url: string
-  resultUrl?: string
-  resultId?: number
-  resultVersionId?: number
+export interface InitializeResult {
+  projects?: Project[]
+  pages?: Page[]
+  error?: unknown
 }

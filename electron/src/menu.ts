@@ -1,5 +1,7 @@
-import { Menu, MenuItem, isMac, BrowserWindow, MenuItemConstructorOptions } from "electron"
+import { Menu, MenuItem, BrowserWindow, MenuItemConstructorOptions } from "electron"
 import { ConnChannels } from "cbt-screenshot-common"
+
+var isMac = process.platform == "darwin"
 
 const template: (MenuItemConstructorOptions | MenuItem)[] = [
   {

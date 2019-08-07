@@ -1,26 +1,26 @@
 import { IpcRenderer } from "electron"
-import { ConnChannels } from "cbt-screenshot-common"
+import { ConnChannels, InitializeResult } from "cbt-screenshot-common"
+import dataCache from "./data-cache"
 
 var ipc: IpcRenderer = window.electron.ipcRenderer
 
-class RemoteServiceClass {
-  initialize(): Promise<void> {
+class IpcClient {
+  initialize(connectionString: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      ipc.once(ConnChannels.InitializeCallback, error => {
-        if (error) {
-          console.error(ConnChannels.Initialize, error)
+      ipc.once(ConnChannels.InitializeCallback, (evert, result: InitializeResult) => {
+        if (result.error) {
+          console.error("Initialize Failed", result.error)
           reject()
         } else {
+          dataCache.init(result)
           resolve()
         }
       })
 
-      ipc.send(ConnChannels.Initialize)
+      ipc.send(ConnChannels.Initialize, connectionString)
     })
   }
 }
 
-
-
-var remoteService = new RemoteServiceClass()
-export default remoteService
+var ipcClient = new IpcClient()
+export default ipcClient

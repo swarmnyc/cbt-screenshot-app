@@ -1,7 +1,7 @@
-import { List, ListItem, ListItemText } from "@material-ui/core";
-import React from "react";
-import SettingService from "services/setting-service";
-import { Page, Project } from "../types";
+import { List, ListItem, ListItemText } from "@material-ui/core"
+import { Page, Project } from "cbt-screenshot-common"
+import React from "react"
+import dataCache from "services/data-cache"
 
 interface Props {
   project: Project
@@ -16,7 +16,7 @@ export default class HomeLeft extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
-    this.state = { pages: SettingService.getPages(this.props.project.id) }
+    this.state = { pages: dataCache.projectPageMap.get(this.props.project._id) }
   }
 
   render(): React.ReactElement {
@@ -24,13 +24,13 @@ export default class HomeLeft extends React.Component<Props, State> {
       <List className="home-left-container" dense>
         {this.state.pages.map(page => (
           <ListItem
-            key={page.url}
+            key={page._id}
             button
             onClick={() => {
               this.props.onPageSelected(page)
             }}
           >
-            <ListItemText primary={page.name} title={page.url} />
+            <ListItemText primary={page.name} title={page.path} />
           </ListItem>
         ))}
       </List>
