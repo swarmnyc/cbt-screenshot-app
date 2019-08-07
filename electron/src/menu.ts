@@ -8,6 +8,12 @@ const template: (MenuItemConstructorOptions | MenuItem)[] = [
     label: "File",
     submenu: [
       {
+        label: "Change Connection",
+        click(menuItem: MenuItem, currentWindow: BrowserWindow) {
+          currentWindow.webContents.send(ConnChannels.ChangeConnection)
+        }
+      },
+      {
         label: "Settings",
         click(menuItem: MenuItem, currentWindow: BrowserWindow) {
           currentWindow.webContents.send(ConnChannels.OpenSettings)

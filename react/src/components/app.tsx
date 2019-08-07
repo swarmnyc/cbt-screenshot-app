@@ -26,6 +26,8 @@ export default class App extends React.Component<{}, State> {
   componentDidMount(): void {
     // init
     settingService.getDbConnectionString().then(connStr => {
+      if (connStr == null) return
+
       ipcClient
         .initialize(connStr)
         .then(() => {

@@ -1,6 +1,7 @@
 export declare type ObjectId = any
 
 export enum ConnChannels {
+  ChangeConnection = "ChangeConnection",
   Initialize = "Initialize",
   InitializeCallback = "InitializeCallback",
   OpenSettings = "OpenSettings"
