@@ -1,10 +1,12 @@
 export declare type ObjectId = any
 
-export enum ConnChannels {
+export enum ConnChannel {
   ChangeConnection = "ChangeConnection",
+  CreateProject = "CreateProject",
+  CreateProjectCallback = "CreateProjectCallback",
   Initialize = "Initialize",
   InitializeCallback = "InitializeCallback",
-  OpenSettings = "OpenSettings"
+  OpenSettings = "OpenSettings",
 }
 
 export enum LoadStatus {
@@ -41,5 +43,4 @@ export interface Page {
 export interface InitializeResult {
   projects?: Project[]
   pages?: Page[]
-  error?: unknown
 }

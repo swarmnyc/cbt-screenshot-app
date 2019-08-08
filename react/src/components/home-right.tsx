@@ -1,9 +1,9 @@
-import React from "react"
-import { Page, LoadStatus, Project, PageView, CbtScreenshot, CbtScreenshotVersion } from "cbt-screenshot-common"
-import cbtApiService from "services/cbt-api-service"
-import Loading from "./loading"
-import Error from "./error"
 import { Box, Typography } from "@material-ui/core"
+import { CbtScreenshot, CbtScreenshotVersion, LoadStatus, PageView, Project } from "cbt-screenshot-common"
+import React from "react"
+import cbtApiService from "services/cbt-api-service"
+import Error from "./error"
+import Loading from "./loading"
 
 const UserAgent = "Mozilla/5.0"
 
@@ -26,7 +26,7 @@ export default class HomeRight extends React.Component<Props, State> {
   }
 
   componentWillReceiveProps(nextProps: Readonly<Props>): void {
-    if (this.props.page != nextProps.page) {
+    if (this.props.page !== nextProps.page) {
       this.setState({ status: LoadStatus.Loading })
       this.fetchCbtScreenshot(nextProps.project, nextProps.page)
     }

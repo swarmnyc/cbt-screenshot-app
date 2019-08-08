@@ -28,6 +28,12 @@ class DataCache {
     })
   }
 
+  addProject(project: Project) {
+    this.projectArray.push(project)
+    this.projectMap.set(project._id, project)
+    this.projectPageMap.set(project._id, [])
+  }
+
   get hasNoProject(): boolean {
     return this.projectArray.length === 0
   }

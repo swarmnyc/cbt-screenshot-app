@@ -1,9 +1,11 @@
-import { MongoClient, Db } from "mongodb"
+import { MongoClient, Db, Collection } from "mongodb"
 import { Project, Page, InitializeResult } from "cbt-screenshot-common"
 
 class DbClient {
   private connectionString: string
   private db: Db
+  private projectCollection: Collection
+  private pageCollection: Collection
 
   constructor() {}
 
@@ -26,6 +28,9 @@ class DbClient {
             console.log("DB Connected")
 
             this.db = mongoClient.db()
+            this.projectCollection = this.db.collection("projects")
+            this.pageCollection = this.db.collection("pages")
+
             resolve()
           }
         })
@@ -39,31 +44,55 @@ class DbClient {
     var projects = await this.getProjects()
     var pages = await this.getPages()
 
-    // change ObjectId to String
-    projects.forEach(p => {
-      p._id = p._id.toString()
-    })
-
-    pages.forEach(p => {
-      p._id = p._id.toString()
-      p.projectId = p.projectId.toString()
-    })
+    this.forEachObjectIdToString(projects)
+    this.forEachObjectIdToString(pages, "projectId")
 
     return { projects, pages }
   }
 
   getProjects(): Promise<Project[]> {
-    return this.db
-      .collection("projects")
-      .find()
-      .toArray()
+    return this.projectCollection.find().toArray()
   }
 
   getPages(): Promise<Page[]> {
-    return this.db
-      .collection("pages")
-      .find()
-      .toArray()
+    return this.pageCollection.find().toArray()
+  }
+
+  createProject(projectName: string): Promise<Project> {
+    return new Promise((resolve, reject) => {
+      this.projectCollection.insert(
+        {
+          name: projectName
+        },
+        (error, result) => {
+          if (error) {
+            reject(error)
+          } else {
+            resolve(this.objectIdToString(result.ops[0]))
+          }
+        }
+      )
+    })
+  }
+
+  private objectIdToString(target: any, ...props: string[]): any {
+    target._id = target._id.toString()
+
+    if (props) {
+      for (const name of props) {
+        target[name] = target[name].toString()
+      }
+    }
+
+    return target
+  }
+
+  private forEachObjectIdToString(targets: any[], ...props: string[]): any[] {
+    targets.forEach(target => {
+      this.objectIdToString(target, ...props)
+    })
+
+    return targets
   }
 }
 

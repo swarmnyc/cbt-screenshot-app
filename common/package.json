@@ -5,7 +5,8 @@
   "main": "./build/index.js",
   "types": "./index.ts",
   "scripts": {
-    "postinstall": "tsc"
+    "start": "tsc --watch",
+    "build": "tsc"
   },
   "dependencies": {},
   "devDependencies": {}

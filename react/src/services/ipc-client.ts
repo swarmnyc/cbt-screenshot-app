@@ -1,5 +1,5 @@
 import { IpcRenderer } from "electron"
-import { ConnChannels, InitializeResult } from "cbt-screenshot-common"
+import { ConnChannel, InitializeResult, Project } from "cbt-screenshot-common"
 import dataCache from "./data-cache"
 
 var ipc: IpcRenderer = window.electron.ipcRenderer
@@ -7,9 +7,9 @@ var ipc: IpcRenderer = window.electron.ipcRenderer
 class IpcClient {
   initialize(connectionString: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      ipc.once(ConnChannels.InitializeCallback, (evert, result: InitializeResult) => {
-        if (result.error) {
-          console.error("Initialize Failed", result.error)
+      ipc.once(ConnChannel.InitializeCallback, (evert, error, result: InitializeResult) => {
+        if (error) {
+          console.error("Initialize Failed", error)
           reject()
         } else {
           dataCache.init(result)
@@ -17,7 +17,23 @@ class IpcClient {
         }
       })
 
-      ipc.send(ConnChannels.Initialize, connectionString)
+      ipc.send(ConnChannel.Initialize, connectionString)
+    })
+  }
+
+  createProject(projectName: string): Promise<Project> {
+    return new Promise((resolve, reject) => {
+      ipc.once(ConnChannel.CreateProjectCallback, (evert, error, project: Project) => {
+        if (error) {
+          console.error("Create Project Failed", error)
+          reject()
+        } else {
+          dataCache.addProject(project)
+          resolve(project)
+        }
+      })
+
+      ipc.send(ConnChannel.CreateProject, projectName)
     })
   }
 }

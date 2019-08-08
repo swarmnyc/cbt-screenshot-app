@@ -4,11 +4,8 @@
   "private": true,
   "main": "./src/main.ts",
   "scripts": {
-    "tsc": "tsc",
-    "update:common": "npm install --no-audit ../common",
     "start": "cross-env NODE_ENV=development electron --require ts-node/register .",
-    "start:with-common": "npm run update:common && npm run start",
-    "prebuild": "npm run update:common && rimraf build && tsc",
+    "prebuild": "rimraf build && tsc",
     "build": "electron-builder"
   },
   "dependencies": {

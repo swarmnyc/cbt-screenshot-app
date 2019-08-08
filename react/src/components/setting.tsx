@@ -3,10 +3,29 @@ import { RouteComponentProps } from "react-router-dom"
 import SettingService from "services/setting-service"
 import Swal from "sweetalert2"
 import { Project } from "cbt-screenshot-common"
+import {
+  AppBar,
+  Toolbar,
+  Box,
+  IconButton,
+  Typography,
+  NativeSelect,
+  Button,
+  FormControl,
+  InputLabel,
+  Input,
+  Paper,
+  TextField
+} from "@material-ui/core"
+import { KeyboardBackspace } from "@material-ui/icons"
+import navigator from "../services/navigator"
+import dataCache from "../services/data-cache"
+import { display } from "@material-ui/system"
+import ipcClient from "services/ipc-client"
 
 interface State {
   projects?: Project[]
-  projectId?: string
+  project?: Project
   config?: string
   pages?: string
 }
@@ -15,107 +34,123 @@ export default class Setting extends React.Component<RouteComponentProps, State>
   constructor(props: RouteComponentProps) {
     super(props)
 
-    // var projects = SettingService.getProjects()
-    // var projectId = projects.length > 0 ? projects[0].id : ""
-    // this.state = this.getProjectState(projectId, projects)
+    this.state = { project: dataCache.projectArray[0] }
   }
 
   render(): React.ReactElement {
-    return <div>test</div>
-    // return (
-    //   <div className="container-fluid p-3 mb-5">
-    //     <h1>Settings</h1>
-    //     <div className="row">
-    //       <div className="col">
-    //         <div className="form-inline">
-    //           <label htmlFor="project">Projects</label>
-    //           <select
-    //             className="custom-select mx-1"
-    //             id="project"
-    //             value={this.state.projectId}
-    //             onChange={this.selectProject}
-    //           >
-    //             {this.state.projects.length === 0 && <option>No Project</option>}
-    //             {this.state.projects.map(p => (
-    //               <option key={p.id} value={p.id}>
-    //                 {p.name}
-    //               </option>
-    //             ))}
-    //           </select>
-    //           <button type="button" className="btn ml-2 btn-dark" onClick={this.addProject}>
-    //             Add Project
-    //           </button>
+    var projects = dataCache.projectArray
+    var { project } = this.state
+    var projectId: string = project ? project._id : ""
+    return (
+      <>
+        <AppBar position="static">
+          <Toolbar variant="dense" disableGutters={true}>
+            <IconButton title="Back" color="inherit" onClick={this.onLeave}>
+              <KeyboardBackspace />
+            </IconButton>
 
-    //           {this.state.projectId && (
-    //             <>
-    //               <button type="button" className="btn mx-1 btn-secondary" onClick={this.renameProject}>
-    //                 Rename
-    //               </button>
+            <Typography>Settings</Typography>
+          </Toolbar>
+        </AppBar>
+        <Box className="m-2">
+          <Box style={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="h6" className="mx-2">
+              Project:
+            </Typography>
+            <NativeSelect value={projectId} onChange={this.onProjectSelected}>
+              {projects.length === 0 && <option>No Project</option>}
+              {projects.map(p => (
+                <option key={p._id} value={p._id}>
+                  {p.name}
+                </option>
+              ))}
+            </NativeSelect>
+            <Button variant="contained" className="m-2" onClick={this.addProject}>
+              Add
+            </Button>
 
-    //               <button type="button" className="btn btn-danger" onClick={this.deleteProject}>
-    //                 Delete
-    //               </button>
-    //             </>
-    //           )}
-    //         </div>
-    //       </div>
-    //     </div>
-
-    //     {this.state.projectId && this.renderProject()}
-
-    //     <div className="fixed-bottom bg-secondary py-2 px-3">
-    //       <button type="button" className="btn btn-primary" onClick={this.save}>
-    //         Save
-    //       </button>
-
-    //       <button type="button" className="btn btn-danger float-right" onClick={this.cancel}>
-    //         Cancel
-    //       </button>
-    //     </div>
-    //   </div>
-    // )
+            {projectId && (
+              <>
+                <Button variant="contained" onClick={this.deleteProject}>
+                  Delete
+                </Button>
+              </>
+            )}
+          </Box>
+        </Box>
+        {projectId && this.renderProject()}
+      </>
+    )
   }
 
   private renderProject(): React.ReactElement {
+    var { project } = this.state
+    var mobileBrowsers = (project.mobileBrowsers || []).join(", ")
+    var desktopBrowsers = (project.desktopBrowsers || []).join(", ")
+
     return (
       <>
-        <div className="row">
-          <div className="col">
-            <h2 className="my-2">Config</h2>
-            <p>The config of CrossBrowserTesting such as username, password and the browsers of screenshot</p>
+        <Typography className="mx-3 my-2">Configs</Typography>
 
-            <textarea className="form-control" rows={15} onChange={this.updateConfig} value={this.state.config} />
-          </div>
-          <div className="col">
-            <h2 className="my-2">Pages</h2>
-            <p>The settings of pages</p>
-            <textarea className="form-control" rows={15} onChange={this.updatePages} value={this.state.pages} />
-          </div>
-        </div>
+        <Paper className="m-2 p-2" key={project._id}>
+          <TextField id="project-name" fullWidth label="Name" defaultValue={project.name} />
+
+          <TextField
+            id="project-username"
+            label="CBT UserName"
+            className="mt-3"
+            fullWidth
+            defaultValue={project.authName}
+          />
+
+          <TextField
+            id="project-authkey"
+            label="CBT Auth Key"
+            className="mt-3"
+            fullWidth
+            defaultValue={project.authKey}
+          />
+
+          <TextField
+            id="project-mobile-browsers"
+            label="CBT Auth Key"
+            className="mt-3"
+            helperText="use comma to separate"
+            fullWidth
+            defaultValue={mobileBrowsers}
+          />
+
+          <TextField
+            id="project-desktop-browsers"
+            label="CBT Auth Key"
+            className="mt-3"
+            fullWidth
+            defaultValue={desktopBrowsers}
+            helperText="use comma to separate"
+          />
+        </Paper>
       </>
     )
   }
 
   private addProject = () => {
-    // Swal.fire({
-    //   title: "Place enter the project name",
-    //   input: "text",
-    //   showCancelButton: true
-    // }).then(result => {
-    //   if (result.dismiss) return
-    //   var projectName = result.value
-    //   if (projectName) {
-    //     var project = SettingService.createProject(projectName)
-    //     this.setState(this.getProjectState(project.id, SettingService.getProjects()))
-    //   }
-    // })
+    Swal.fire({
+      title: "Place enter the project name",
+      input: "text",
+      showCancelButton: true
+    }).then(result => {
+      if (result.dismiss) return
+      var projectName = result.value
+      if (projectName) {
+        ipcClient.createProject(projectName).then(project => {
+          this.setState({ project })
+        })
+      }
+    })
   }
 
-  private selectProject = (event: React.SyntheticEvent) => {
-    var target = event.target as HTMLSelectElement
-    var projectId = target.value
-
-    this.setState(this.getProjectState(projectId))
+  private onProjectSelected = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    this.setState({ project: dataCache.projectMap.get(event.target.value) })
   }
 
   private getProjectState = (projectId: string, projects?: Project[]): State => {
@@ -188,7 +223,8 @@ export default class Setting extends React.Component<RouteComponentProps, State>
     this.props.history.replace("/")
   }
 
-  private cancel = () => {
-    this.props.history.replace("/")
+  private onLeave = () => {
+    // TODO: check change or not
+    navigator.openHome()
   }
 }

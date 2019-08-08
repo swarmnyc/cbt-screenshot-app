@@ -5,10 +5,7 @@
   "main": "app/main.js",
   "homepage": "./",
   "scripts": {
-    "update:common": "npm install --no-audit ../common",
-    "prestart": "npm run update:common",
     "start": "cross-env BROWSER=none react-scripts start",
-    "prebuild": "npm run update:common",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "lint": "eslint --ext ts --ext tsx --quiet src"

@@ -3,9 +3,10 @@ import { PresentToAll, Settings } from "@material-ui/icons"
 import { Page, Project } from "cbt-screenshot-common"
 import React from "react"
 import SplitPane from "react-split-pane"
-import dataCache from "services/data-cache"
+import dataCache from "../services/data-cache"
 import HomeLeft from "./home-left"
 import HomeRight from "./home-right"
+import navigator from "../services/navigator"
 
 interface State {
   project?: Project
@@ -40,7 +41,7 @@ export default class Home extends React.Component<{}, State> {
             <IconButton title="Task Screenshots" color="inherit" onClick={() => {}}>
               <PresentToAll />
             </IconButton>
-            <IconButton title="Settings" color="inherit">
+            <IconButton title="Settings" color="inherit" onClick={navigator.openSettings}>
               <Settings />
             </IconButton>
           </Toolbar>
