@@ -65,7 +65,7 @@ class DbClient {
     })
   }
 
-  updateProjectProperty(projectId: string, prop: string, value: any): Promise<any> {
+  updateProjectProperty(projectId: string, prop: string, value: any): Promise<void> {
     var id = ObjectId.createFromHexString(projectId)
     return this.projectCollection
       .updateOne(
@@ -79,6 +79,12 @@ class DbClient {
         }
       )
       .then(() => {})
+  }
+
+  async deleteProject(projectId: string): Promise<void> {
+    var id = ObjectId.createFromHexString(projectId)
+    await this.projectCollection.deleteOne({ _id: id })
+    await this.pageCollection.deleteMany({ projectId: id })
   }
 
   private async initData(): Promise<InitializeResult> {

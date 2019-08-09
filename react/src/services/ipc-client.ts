@@ -44,6 +44,16 @@ class IpcClient {
     )
   }
 
+  deleteProject(project: Project) {
+    return this.createHandler(
+      C2MChannel.DeleteProject,
+      () => {
+        dataCache.deleteProject(project)
+      },
+      project._id
+    )
+  }
+
   private createHandler<T>(
     channel: C2MChannel,
     successHandler: (...eventArgs: any) => T,

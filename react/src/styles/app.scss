@@ -18,6 +18,12 @@
   &.MuiInput-underline:hover:after {
     border-bottom: 2px solid #fff;
   }
+
+  .MuiNativeSelect-select {
+    option {
+      background-color: #3f51b5 !important;
+    }
+  }
 }
 /* #endregion */
 

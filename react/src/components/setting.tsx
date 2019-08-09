@@ -24,7 +24,6 @@ import { display } from "@material-ui/system"
 import ipcClient from "services/ipc-client"
 
 interface State {
-  projects?: Project[]
   project?: Project
   config?: string
   pages?: string
@@ -120,6 +119,15 @@ export default class Setting extends React.Component<RouteComponentProps, State>
           />
 
           <TextField
+            id="project-domain"
+            label="Website domain"
+            className="mt-3"
+            fullWidth
+            defaultValue={project.domain}
+            onBlur={this.onConfigChanged}
+          />
+
+          <TextField
             id="project-mobileBrowsers"
             label="CBT Mobile Browsers"
             className="mt-3"
@@ -178,21 +186,18 @@ export default class Setting extends React.Component<RouteComponentProps, State>
   }
 
   private deleteProject = () => {
-    // Swal.fire({
-    //   title: "Do you want to delete this project?",
-    //   type: "warning",
-    //   showCancelButton: true,
-    //   confirmButtonColor: "#3085d6",
-    //   cancelButtonColor: "#d33",
-    //   confirmButtonText: "Yes, delete it!"
-    // }).then(result => {
-    //   if (result.dismiss) return
-    //   SettingService.deleteProject(this.state.projectId)
-    //   var projects = SettingService.getProjects()
-    //   var project = projects[0]
-    //   var projectId = project ? project.id : null
-    //   this.setState(this.getProjectState(projectId, projects))
-    // })
+    Swal.fire({
+      title: "Do you want to delete this project?",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async result => {
+      if (result.dismiss) return
+      await ipcClient.deleteProject(this.state.project)
+      this.setState({ project: dataCache.projectArray[0] })
+    })
   }
 
   private onLeave = () => {

@@ -4,7 +4,8 @@ export declare type ObjectId = any
 export enum C2MChannel {
   CreateProject = "CreateProject",
   Initialize = "Initialize",
-  UpdateProjectProperty = "UpdateProjectProperty"
+  UpdateProjectProperty = "UpdateProjectProperty",
+  DeleteProject = "DeleteProject"
 }
 
 /** Main to Client channels */
