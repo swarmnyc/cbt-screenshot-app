@@ -93,40 +93,50 @@ export default class Setting extends React.Component<RouteComponentProps, State>
         <Typography className="mx-3 my-2">Configs</Typography>
 
         <Paper className="m-2 p-2" key={project._id}>
-          <TextField id="project-name" fullWidth label="Name" defaultValue={project.name} />
+          <TextField
+            id="project-name"
+            label="Name"
+            fullWidth
+            defaultValue={project.name}
+            onBlur={this.onConfigChanged}
+          />
 
           <TextField
-            id="project-username"
+            id="project-authName"
             label="CBT UserName"
             className="mt-3"
             fullWidth
             defaultValue={project.authName}
+            onBlur={this.onConfigChanged}
           />
 
           <TextField
-            id="project-authkey"
+            id="project-authKey"
             label="CBT Auth Key"
             className="mt-3"
             fullWidth
             defaultValue={project.authKey}
+            onBlur={this.onConfigChanged}
           />
 
           <TextField
-            id="project-mobile-browsers"
-            label="CBT Auth Key"
+            id="project-mobileBrowsers"
+            label="CBT Mobile Browsers"
             className="mt-3"
-            helperText="use comma to separate"
+            helperText="use comma(,) to separate"
             fullWidth
             defaultValue={mobileBrowsers}
+            onBlur={this.onConfigChanged}
           />
 
           <TextField
-            id="project-desktop-browsers"
-            label="CBT Auth Key"
+            id="project-desktopBrowsers"
+            label="CBT Desktop Browsers"
             className="mt-3"
             fullWidth
             defaultValue={desktopBrowsers}
-            helperText="use comma to separate"
+            helperText="use comma(,) to separate"
+            onBlur={this.onConfigChanged}
           />
         </Paper>
       </>
@@ -153,35 +163,18 @@ export default class Setting extends React.Component<RouteComponentProps, State>
     this.setState({ project: dataCache.projectMap.get(event.target.value) })
   }
 
-  private getProjectState = (projectId: string, projects?: Project[]): State => {
-    throw new Error()
-    // var project = projectId ? SettingService.getProject(projectId) : null
-    // var config = project ? JSON.stringify(project.config, null, 4) : ""
-    // var pages = project ? JSON.stringify(project.pages, null, 4) : ""
+  private onConfigChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+    var prop = event.target.id.split("-")[1] as keyof Project
+    var value = event.target.value.trim()
 
-    // var state: State = { projectId, config, pages }
-    // if (projects) {
-    //   state.projects = projects
-    // }
-
-    // return state
-  }
-
-  private renameProject = () => {
-    // var project = SettingService.getProject(this.state.projectId)
-    // Swal.fire({
-    //   title: "Place enter the project name",
-    //   input: "text",
-    //   inputValue: project.name,
-    //   showCancelButton: true
-    // }).then(result => {
-    //   if (result.dismiss) return
-    //   var projectName = result.value
-    //   if (projectName && projectName !== project.name) {
-    //     project.name = projectName
-    //     this.forceUpdate()
-    //   }
-    // })
+    if (event.target.defaultValue != event.target.value) {
+      ipcClient.updateProjectProperty(this.state.project, prop, value).then(() => {
+        // update name on select
+        if (prop == "name") {
+          this.setState({ project: this.state.project })
+        }
+      })
+    }
   }
 
   private deleteProject = () => {
@@ -202,29 +195,7 @@ export default class Setting extends React.Component<RouteComponentProps, State>
     // })
   }
 
-  private updateConfig = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    // try {
-    //   var config = JSON.parse(event.target.value)
-    //   SettingService.getProject(this.state.projectId).config = config
-    // } catch (e) {}
-    // this.setState({ config: event.target.value })
-  }
-
-  private updatePages = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    // try {
-    //   var pages = JSON.parse(event.target.value)
-    //   SettingService.getProject(this.state.projectId).pages = pages
-    // } catch (e) {}
-    // this.setState({ pages: event.target.value })
-  }
-
-  private save = () => {
-    // SettingService.save()
-    this.props.history.replace("/")
-  }
-
   private onLeave = () => {
-    // TODO: check change or not
     navigator.openHome()
   }
 }

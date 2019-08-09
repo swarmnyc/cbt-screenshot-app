@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection } from "mongodb"
+import { MongoClient, Db, Collection, ObjectId } from "mongodb"
 import { Project, Page, InitializeResult } from "cbt-screenshot-common"
 
 class DbClient {
@@ -40,16 +40,6 @@ class DbClient {
     }
   }
 
-  private async initData(): Promise<InitializeResult> {
-    var projects = await this.getProjects()
-    var pages = await this.getPages()
-
-    this.forEachObjectIdToString(projects)
-    this.forEachObjectIdToString(pages, "projectId")
-
-    return { projects, pages }
-  }
-
   getProjects(): Promise<Project[]> {
     return this.projectCollection.find().toArray()
   }
@@ -73,6 +63,32 @@ class DbClient {
         }
       )
     })
+  }
+
+  updateProjectProperty(projectId: string, prop: string, value: any): Promise<any> {
+    var id = ObjectId.createFromHexString(projectId)
+    return this.projectCollection
+      .updateOne(
+        {
+          _id: id
+        },
+        {
+          $set: {
+            [prop]: value
+          }
+        }
+      )
+      .then(() => {})
+  }
+
+  private async initData(): Promise<InitializeResult> {
+    var projects = await this.getProjects()
+    var pages = await this.getPages()
+
+    this.forEachObjectIdToString(projects)
+    this.forEachObjectIdToString(pages, "projectId")
+
+    return { projects, pages }
   }
 
   private objectIdToString(target: any, ...props: string[]): any {

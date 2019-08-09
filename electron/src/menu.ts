@@ -1,5 +1,5 @@
 import { Menu, MenuItem, BrowserWindow, MenuItemConstructorOptions } from "electron"
-import { ConnChannel } from "cbt-screenshot-common"
+import { M2CChannel } from "cbt-screenshot-common"
 
 var isMac = process.platform == "darwin"
 
@@ -10,13 +10,13 @@ const template: (MenuItemConstructorOptions | MenuItem)[] = [
       {
         label: "Change Connection",
         click(menuItem: MenuItem, currentWindow: BrowserWindow) {
-          currentWindow.webContents.send(ConnChannel.ChangeConnection)
+          currentWindow.webContents.send(M2CChannel.ChangeConnection)
         }
       },
       {
         label: "Settings",
         click(menuItem: MenuItem, currentWindow: BrowserWindow) {
-          currentWindow.webContents.send(ConnChannel.OpenSettings)
+          currentWindow.webContents.send(M2CChannel.OpenSettings)
         }
       },
       { type: "separator" },
@@ -37,7 +37,7 @@ const template: (MenuItemConstructorOptions | MenuItem)[] = [
     ]
   },
   {
-    label: "View",
+    label: "Help",
     submenu: [{ role: "reload" }, { role: "forcereload" }, { role: "toggledevtools" }]
   }
 ]

@@ -1,11 +1,15 @@
 export declare type ObjectId = any
 
-export enum ConnChannel {
-  ChangeConnection = "ChangeConnection",
+/** Client to Main channels */
+export enum C2MChannel {
   CreateProject = "CreateProject",
-  CreateProjectCallback = "CreateProjectCallback",
   Initialize = "Initialize",
-  InitializeCallback = "InitializeCallback",
+  UpdateProjectProperty = "UpdateProjectProperty"
+}
+
+/** Main to Client channels */
+export enum M2CChannel {
+  ChangeConnection = "ChangeConnection",
   OpenSettings = "OpenSettings",
 }
 

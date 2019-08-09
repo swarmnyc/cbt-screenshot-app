@@ -1,28 +1,33 @@
-import { ConnChannel } from "cbt-screenshot-common"
+import { C2MChannel } from "cbt-screenshot-common"
 import { ipcMain, BrowserWindow, Event } from "electron"
 import dbClient from "./db-client"
 
 export class IpcServer {
   constructor(private window: BrowserWindow) {
-    ipcMain.on(ConnChannel.Initialize, this.initialize)
-    ipcMain.on(ConnChannel.CreateProject, this.createProject)
+    ipcMain.on(C2MChannel.Initialize, this.initialize)
+    ipcMain.on(C2MChannel.CreateProject, this.createProject)
+    ipcMain.on(C2MChannel.UpdateProjectProperty, this.updateProjectProperty)
   }
 
   initialize = async (_: Event, connectionString: string) => {
-    this.execute(ConnChannel.InitializeCallback, () => dbClient.init(connectionString))
+    this.execute(C2MChannel.Initialize, () => dbClient.init(connectionString))
   }
 
   createProject = async (_: Event, projectName: string) => {
-    this.execute(ConnChannel.CreateProjectCallback, () => dbClient.createProject(projectName))
+    this.execute(C2MChannel.CreateProject, () => dbClient.createProject(projectName))
   }
 
-  private execute(channel: ConnChannel, body: () => Promise<any>): void {
+  updateProjectProperty = async (_: Event, projectId: string, prop: string, value: any) => {
+    this.execute(C2MChannel.UpdateProjectProperty, () => dbClient.updateProjectProperty(projectId, prop, value))
+  }
+
+  private execute(channel: C2MChannel, body: () => Promise<any>): void {
     body()
       .then(result => {
-        this.window.webContents.send(channel, null, result)
+        this.window.webContents.send(channel + "Callback", null, result)
       })
       .catch(error => {
-        this.window.webContents.send(channel, error)
+        this.window.webContents.send(channel + "Callback", error)
       })
   }
 }
