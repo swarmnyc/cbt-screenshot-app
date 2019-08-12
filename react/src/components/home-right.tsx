@@ -67,7 +67,7 @@ export default class HomeRight extends React.Component<Props, State> {
       return
     }
 
-    if (page.screenshot !== null) {
+    if (page.screenshot) {
       this.setState({
         status: LoadStatus.Loaded,
         screenshot: page.screenshot,
