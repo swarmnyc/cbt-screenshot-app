@@ -5,7 +5,7 @@
     "buildResources": "assets"
   },
   "extraMetadata": {
-    "main": "main.ts"
+    "main": "main.js"
   },
   "files": [
     {

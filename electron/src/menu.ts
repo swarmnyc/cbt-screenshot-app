@@ -1,4 +1,4 @@
-import { Menu, MenuItem, BrowserWindow, MenuItemConstructorOptions } from "electron"
+import { Menu, MenuItem, BrowserWindow, MenuItemConstructorOptions, remote, dialog, app } from "electron"
 import { M2CChannel } from "cbt-screenshot-common"
 
 var isMac = process.platform == "darwin"
@@ -38,7 +38,22 @@ const template: (MenuItemConstructorOptions | MenuItem)[] = [
   },
   {
     label: "Help",
-    submenu: [{ role: "reload" }, { role: "forcereload" }, { role: "toggledevtools" }]
+    submenu: [
+      { role: "reload" },
+      { role: "forcereload" },
+      { role: "toggledevtools" },
+      { type: "separator" },
+      {
+        label: "About",
+        click() {
+          dialog.showMessageBox({
+            title: `About`,
+            message: `CBT Screenshot App (v${app.getVersion()})`,
+            detail: `Created by SWARM`
+          })
+        }
+      }
+    ]
   }
 ]
 

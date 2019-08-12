@@ -1,4 +1,4 @@
-import { C2MChannel } from "cbt-screenshot-common"
+import { C2MChannel, Page } from "cbt-screenshot-common"
 import { ipcMain, BrowserWindow, Event } from "electron"
 import dbClient from "./db-client"
 
@@ -8,6 +8,10 @@ export class IpcServer {
     ipcMain.on(C2MChannel.CreateProject, this.createProject)
     ipcMain.on(C2MChannel.UpdateProjectProperty, this.updateProjectProperty)
     ipcMain.on(C2MChannel.DeleteProject, this.deleteProject)
+
+    ipcMain.on(C2MChannel.CreatePage, this.createPage)
+    ipcMain.on(C2MChannel.UpdatePageProperty, this.updatePageProperty)
+    ipcMain.on(C2MChannel.DeletePage, this.deletePage)
   }
 
   initialize = async (_: Event, connectionString: string) => {
@@ -24,6 +28,18 @@ export class IpcServer {
 
   deleteProject = async (_: Event, projectId: string) => {
     this.execute(C2MChannel.DeleteProject, () => dbClient.deleteProject(projectId))
+  }
+
+  createPage = async (_: Event, page: Page) => {
+    this.execute(C2MChannel.CreatePage, () => dbClient.createPage(page))
+  }
+
+  updatePageProperty = async (_: Event, pageId: string, prop: string, value: any) => {
+    this.execute(C2MChannel.UpdatePageProperty, () => dbClient.updatePageProperty(pageId, prop, value))
+  }
+
+  deletePage = async (_: Event, pageId: string) => {
+    this.execute(C2MChannel.DeletePage, () => dbClient.deletePage(pageId))
   }
 
   private execute(channel: C2MChannel, body: () => Promise<any>): void {

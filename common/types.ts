@@ -2,16 +2,19 @@ export declare type ObjectId = any
 
 /** Client to Main channels */
 export enum C2MChannel {
+  CreatePage = "CreatePage",
   CreateProject = "CreateProject",
+  DeletePage = "DeletePage",
+  DeleteProject = "DeleteProject",
   Initialize = "Initialize",
+  UpdatePageProperty = "UpdatePageProperty",
   UpdateProjectProperty = "UpdateProjectProperty",
-  DeleteProject = "DeleteProject"
 }
 
 /** Main to Client channels */
 export enum M2CChannel {
   ChangeConnection = "ChangeConnection",
-  OpenSettings = "OpenSettings",
+  OpenSettings = "OpenSettings"
 }
 
 export enum LoadStatus {
@@ -38,14 +41,18 @@ export interface Project {
 
 export interface Page {
   _id: ObjectId | string
-  projectId: ObjectId | string
-  name: string
-  path: string
+  projectId?: ObjectId | string
+  name?: string
+  path?: string
   folder?: string
-  resultId?: number
+  resultId?: number // TODO: remove it
+  desktopResultId?: string
+  mobileResultId?: string
 }
 
 export interface InitializeResult {
   projects?: Project[]
   pages?: Page[]
 }
+
+export type ActionFunc = () => void

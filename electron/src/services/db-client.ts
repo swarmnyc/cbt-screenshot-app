@@ -87,6 +87,42 @@ class DbClient {
     await this.pageCollection.deleteMany({ projectId: id })
   }
 
+  createPage(page: Page): Promise<Project> {
+    page._id = new ObjectId()
+    page.projectId = ObjectId.createFromHexString(page.projectId)
+
+    return new Promise((resolve, reject) => {
+      this.pageCollection.insert(page, error => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(this.objectIdToString(page._id))
+        }
+      })
+    })
+  }
+
+  updatePageProperty(pageId: string, prop: string, value: any): Promise<void> {
+    var id = ObjectId.createFromHexString(pageId)
+    return this.pageCollection
+      .updateOne(
+        {
+          _id: id
+        },
+        {
+          $set: {
+            [prop]: value
+          }
+        }
+      )
+      .then(() => {})
+  }
+
+  async deletePage(pageId: string): Promise<void> {
+    var id = ObjectId.createFromHexString(pageId)
+    await this.pageCollection.deleteOne({ _id: id })
+  }
+
   private async initData(): Promise<InitializeResult> {
     var projects = await this.getProjects()
     var pages = await this.getPages()

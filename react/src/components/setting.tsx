@@ -1,27 +1,14 @@
+import { AppBar, Box, Button, IconButton, NativeSelect, Toolbar, Typography } from "@material-ui/core"
+import { KeyboardBackspace } from "@material-ui/icons"
+import { Project } from "cbt-screenshot-common"
 import React from "react"
 import { RouteComponentProps } from "react-router-dom"
-import SettingService from "services/setting-service"
-import Swal from "sweetalert2"
-import { Project } from "cbt-screenshot-common"
-import {
-  AppBar,
-  Toolbar,
-  Box,
-  IconButton,
-  Typography,
-  NativeSelect,
-  Button,
-  FormControl,
-  InputLabel,
-  Input,
-  Paper,
-  TextField
-} from "@material-ui/core"
-import { KeyboardBackspace } from "@material-ui/icons"
-import navigator from "../services/navigator"
-import dataCache from "../services/data-cache"
-import { display } from "@material-ui/system"
 import ipcClient from "services/ipc-client"
+import Swal from "sweetalert2"
+import dataCache from "../services/data-cache"
+import navigator from "../services/navigator"
+import SettingConfig from "./setting-config"
+import SettingPage from "./setting-page";
 
 interface State {
   project?: Project
@@ -42,7 +29,7 @@ export default class Setting extends React.Component<RouteComponentProps, State>
     var projectId: string = project ? project._id : ""
     return (
       <>
-        <AppBar position="static">
+        <AppBar position="sticky">
           <Toolbar variant="dense" disableGutters={true}>
             <IconButton title="Back" color="inherit" onClick={this.onLeave}>
               <KeyboardBackspace />
@@ -84,70 +71,11 @@ export default class Setting extends React.Component<RouteComponentProps, State>
 
   private renderProject(): React.ReactElement {
     var { project } = this.state
-    var mobileBrowsers = (project.mobileBrowsers || []).join(", ")
-    var desktopBrowsers = (project.desktopBrowsers || []).join(", ")
-
     return (
-      <>
-        <Typography className="mx-3 my-2">Configs</Typography>
-
-        <Paper className="m-2 p-2" key={project._id}>
-          <TextField
-            id="project-name"
-            label="Name"
-            fullWidth
-            defaultValue={project.name}
-            onBlur={this.onConfigChanged}
-          />
-
-          <TextField
-            id="project-authName"
-            label="CBT UserName"
-            className="mt-3"
-            fullWidth
-            defaultValue={project.authName}
-            onBlur={this.onConfigChanged}
-          />
-
-          <TextField
-            id="project-authKey"
-            label="CBT Auth Key"
-            className="mt-3"
-            fullWidth
-            defaultValue={project.authKey}
-            onBlur={this.onConfigChanged}
-          />
-
-          <TextField
-            id="project-domain"
-            label="Website domain"
-            className="mt-3"
-            fullWidth
-            defaultValue={project.domain}
-            onBlur={this.onConfigChanged}
-          />
-
-          <TextField
-            id="project-mobileBrowsers"
-            label="CBT Mobile Browsers"
-            className="mt-3"
-            helperText="use comma(,) to separate"
-            fullWidth
-            defaultValue={mobileBrowsers}
-            onBlur={this.onConfigChanged}
-          />
-
-          <TextField
-            id="project-desktopBrowsers"
-            label="CBT Desktop Browsers"
-            className="mt-3"
-            fullWidth
-            defaultValue={desktopBrowsers}
-            helperText="use comma(,) to separate"
-            onBlur={this.onConfigChanged}
-          />
-        </Paper>
-      </>
+      <React.Fragment key={project._id}>
+        <SettingConfig project={project} onNameChanged={() => this.forceUpdate()} />
+        <SettingPage project={project} />
+      </React.Fragment>
     )
   }
 
@@ -169,20 +97,6 @@ export default class Setting extends React.Component<RouteComponentProps, State>
 
   private onProjectSelected = (event: React.ChangeEvent<HTMLSelectElement>) => {
     this.setState({ project: dataCache.projectMap.get(event.target.value) })
-  }
-
-  private onConfigChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    var prop = event.target.id.split("-")[1] as keyof Project
-    var value = event.target.value.trim()
-
-    if (event.target.defaultValue != event.target.value) {
-      ipcClient.updateProjectProperty(this.state.project, prop, value).then(() => {
-        // update name on select
-        if (prop == "name") {
-          this.setState({ project: this.state.project })
-        }
-      })
-    }
   }
 
   private deleteProject = () => {

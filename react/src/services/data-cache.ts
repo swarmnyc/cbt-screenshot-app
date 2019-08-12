@@ -40,6 +40,18 @@ class DataCache {
     this.projectPageMap.delete(project._id)
   }
 
+  addPage(page: Page) {
+    this.pageArray.push(page)
+    this.pageMap.set(page._id, page)
+    this.projectPageMap.get(page.projectId).push(page)
+  }
+
+  deletePage(page: Page) {
+    this.pageArray = this.pageArray.filter(p => p != page)
+    this.pageMap.delete(page._id)
+    this.projectPageMap.get(page.projectId).filter(p => p != page)
+  }
+
   get hasNoProject(): boolean {
     return this.projectArray.length === 0
   }

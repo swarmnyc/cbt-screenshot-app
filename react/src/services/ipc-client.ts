@@ -1,5 +1,5 @@
 import { IpcRenderer } from "electron"
-import { C2MChannel, InitializeResult, Project } from "cbt-screenshot-common"
+import { C2MChannel, InitializeResult, Project, Page } from "cbt-screenshot-common"
 import dataCache from "./data-cache"
 
 var ipc: IpcRenderer = window.electron.ipcRenderer
@@ -51,6 +51,41 @@ class IpcClient {
         dataCache.deleteProject(project)
       },
       project._id
+    )
+  }
+
+  createPage(page: Page): Promise<Page> {
+    return this.createHandler(
+      C2MChannel.CreatePage,
+      (id: string) => {
+        page._id = id
+        dataCache.addPage(page)
+
+        return page
+      },
+      page
+    )
+  }
+
+  updatePageProperty(page: Page, prop: keyof Page, value: any): Promise<void> {
+    return this.createHandler(
+      C2MChannel.UpdatePageProperty,
+      () => {
+        page[prop] = value
+      },
+      page._id,
+      prop,
+      value
+    )
+  }
+
+  deletePage(page: Page) {
+    return this.createHandler(
+      C2MChannel.DeletePage,
+      () => {
+        dataCache.deletePage(page)
+      },
+      page._id
     )
   }
 
