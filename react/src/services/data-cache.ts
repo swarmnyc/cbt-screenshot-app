@@ -35,7 +35,7 @@ class DataCache {
   }
 
   deleteProject(project: Project) {
-    this.projectArray = this.projectArray.filter(p => p != project)
+    this.projectArray = this.projectArray.filter(p => p !== project)
     this.projectMap.delete(project._id)
     this.projectPageMap.delete(project._id)
   }
@@ -47,9 +47,9 @@ class DataCache {
   }
 
   deletePage(page: Page) {
-    this.pageArray = this.pageArray.filter(p => p != page)
+    this.pageArray = this.pageArray.filter(p => p !== page)
     this.pageMap.delete(page._id)
-    this.projectPageMap.get(page.projectId).filter(p => p != page)
+    this.projectPageMap.get(page.projectId).filter(p => p !== page)
   }
 
   get hasNoProject(): boolean {

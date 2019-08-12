@@ -92,9 +92,9 @@ export default class SettingConfig extends React.Component<Props, State> {
     var prop = event.target.id.split("-")[1] as keyof Project
     var value = event.target.value.trim()
 
-    if (event.target.defaultValue != value) {
+    if (event.target.defaultValue !== value) {
       ipcClient.updateProjectProperty(this.props.project, prop, value).then(() => {
-        if (prop == "name") {
+        if (prop === "name") {
           this.props.onNameChanged()
         }
       })

@@ -1,18 +1,17 @@
 import {
+  Box,
+  Button,
+  IconButton,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  Typography,
-  Grid,
-  Box,
-  Button,
-  IconButton
+  Typography
 } from "@material-ui/core"
 import { Delete } from "@material-ui/icons"
-import { Project, Page } from "cbt-screenshot-common"
+import { Page, Project } from "cbt-screenshot-common"
 import React from "react"
 import dataCache from "services/data-cache"
 import ipcClient from "services/ipc-client"
@@ -70,7 +69,7 @@ export default class SettingPage extends React.Component<Props, State> {
               {this.state.pages.map((page, index) => {
                 return (
                   <TableRow key={page._id}>
-                    <TableCell align="right">{page._id == "new" ? "new" : index + 1}</TableCell>
+                    <TableCell align="right">{page._id === "new" ? "new" : index + 1}</TableCell>
                     <TableCell align="left">
                       <input
                         id={"page-" + page._id + "-path"}
@@ -117,7 +116,7 @@ export default class SettingPage extends React.Component<Props, State> {
                       />
                     </TableCell>
                     <TableCell align="right">
-                      {page._id != "new" && (
+                      {page._id !== "new" && (
                         <IconButton size="small">
                           <Delete />
                         </IconButton>
@@ -134,17 +133,19 @@ export default class SettingPage extends React.Component<Props, State> {
   }
 
   private onPagePropChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    var [_, pageId, prop] = event.target.id.split("-")
+    var arr = event.target.id.split("-")
+    var pageId = arr[1]
+    var prop = arr[2] as keyof Page
     var value = event.target.value.trim()
 
-    if (event.target.defaultValue != value) {
-      if (pageId == "new") {
+    if (event.target.defaultValue !== value) {
+      if (pageId === "new") {
         ipcClient.createPage({
           [prop]: value,
           projectId: this.props.project._id
         } as Page)
       } else {
-        ipcClient.updatePageProperty(dataCache.pageMap.get(pageId), prop as keyof Page, value)
+        ipcClient.updatePageProperty(dataCache.pageMap.get(pageId), prop, value)
       }
     }
   }
