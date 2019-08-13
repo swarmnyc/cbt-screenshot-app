@@ -11,6 +11,7 @@ import {
   Typography
 } from "@material-ui/core"
 import { Delete } from "@material-ui/icons"
+import { ObjectId } from "bson"
 import { Page, Project } from "cbt-screenshot-common"
 import React from "react"
 import dataCache from "services/data-cache"
@@ -26,15 +27,14 @@ interface State {
 }
 
 export default class SettingPage extends React.Component<Props, State> {
-  allPages: Page[]
+  newPage: Page
+  query: string
 
   constructor(props: Props) {
     super(props)
 
-    this.allPages = dataCache.projectPageMap.get(props.project._id)
-
     this.state = {
-      pages: this.allPages.concat([{ _id: "new" }])
+      pages: this.getPages(true)
     }
   }
 
@@ -69,7 +69,7 @@ export default class SettingPage extends React.Component<Props, State> {
               {this.state.pages.map((page, index) => {
                 return (
                   <TableRow key={page._id}>
-                    <TableCell align="right">{page._id === "new" ? "new" : index + 1}</TableCell>
+                    <TableCell align="right">{page === this.newPage ? "new" : index + 1}</TableCell>
                     <TableCell align="left">
                       <input
                         id={"page-" + page._id + "-path"}
@@ -116,8 +116,8 @@ export default class SettingPage extends React.Component<Props, State> {
                       />
                     </TableCell>
                     <TableCell align="right">
-                      {page._id !== "new" && (
-                        <IconButton size="small">
+                      {page !== this.newPage && (
+                        <IconButton id={"page-" + page._id + "-delete"} size="small" onClick={this.onDeletePage}>
                           <Delete />
                         </IconButton>
                       )}
@@ -139,14 +139,36 @@ export default class SettingPage extends React.Component<Props, State> {
     var value = event.target.value.trim()
 
     if (event.target.defaultValue !== value) {
-      if (pageId === "new") {
-        ipcClient.createPage({
-          [prop]: value,
-          projectId: this.props.project._id
-        } as Page)
+      if (pageId === this.newPage._id) {
+        this.newPage[prop] = value
+        ipcClient.createPage(this.newPage).then(() => {
+          this.setState({ pages: this.getPages(true) })
+        })
       } else {
         ipcClient.updatePageProperty(dataCache.pageMap.get(pageId), prop, value)
       }
     }
+  }
+
+  private onDeletePage = (event: React.MouseEvent<HTMLButtonElement>) => {
+    var arr = event.currentTarget.id.split("-")
+    var pageId = arr[1]
+    ipcClient.deletePage(dataCache.pageMap.get(pageId)).then(() => {
+      this.setState({ pages: this.getPages(false) })
+    })
+  }
+
+  private getPages(newPage: boolean): Page[] {
+    var pages = dataCache.projectPageMap.get(this.props.project._id)
+
+    if (this.query) {
+      pages = pages.filter(p => p.path.includes(this.query.toLowerCase()))
+    }
+
+    if (newPage) {
+      this.newPage = { _id: new ObjectId().toHexString(), projectId: this.props.project._id }
+    }
+
+    return pages.concat([this.newPage])
   }
 }

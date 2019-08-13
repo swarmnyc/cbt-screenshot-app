@@ -88,15 +88,19 @@ class DbClient {
   }
 
   createPage(page: Page): Promise<Project> {
-    page._id = new ObjectId()
+    page._id = ObjectId.createFromHexString(page._id)
     page.projectId = ObjectId.createFromHexString(page.projectId)
+
+    if (page.path) {
+      page.path = page.path.toLowerCase()
+    }
 
     return new Promise((resolve, reject) => {
       this.pageCollection.insert(page, error => {
         if (error) {
           reject(error)
         } else {
-          resolve(this.objectIdToString(page._id))
+          resolve(page._id.toString())
         }
       })
     })
@@ -104,6 +108,10 @@ class DbClient {
 
   updatePageProperty(pageId: string, prop: string, value: any): Promise<void> {
     var id = ObjectId.createFromHexString(pageId)
+    if (prop == "page" && typeof value == "string") {
+      value = value.toLowerCase()
+    }
+
     return this.pageCollection
       .updateOne(
         {

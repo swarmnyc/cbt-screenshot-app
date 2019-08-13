@@ -13,10 +13,7 @@
   "dependencies": {
     "@material-ui/core": "^4.3.0",
     "@material-ui/icons": "^4.2.1",
-    "@types/jest": "24.0.15",
-    "@types/node": "12.6.8",
-    "@types/react": "16.8.23",
-    "@types/react-dom": "16.8.5",
+    "bson": "^4.0.2",
     "cbt-screenshot-common": "file:../common",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -27,8 +24,13 @@
     "typescript": "3.5.3"
   },
   "devDependencies": {
+    "@types/bson": "^4.0.0",
     "@types/electron": "^1.6.10",
+    "@types/jest": "24.0.15",
+    "@types/node": "12.6.8",
+    "@types/react-dom": "16.8.5",
     "@types/react-router-dom": "^4.3.4",
+    "@types/react": "16.8.23",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
     "cross-env": "^5.2.0",

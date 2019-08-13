@@ -1,5 +1,5 @@
 import { AppBar, Box, Button, IconButton, NativeSelect, Toolbar, Typography } from "@material-ui/core"
-import { KeyboardBackspace } from "@material-ui/icons"
+import { KeyboardBackspace, Delete, Add } from "@material-ui/icons"
 import { Project } from "cbt-screenshot-common"
 import React from "react"
 import { RouteComponentProps } from "react-router-dom"
@@ -8,7 +8,7 @@ import Swal from "sweetalert2"
 import dataCache from "../services/data-cache"
 import navigator from "../services/navigator"
 import SettingConfig from "./setting-config"
-import SettingPage from "./setting-page";
+import SettingPage from "./setting-page"
 
 interface State {
   project?: Project
@@ -52,12 +52,14 @@ export default class Setting extends React.Component<RouteComponentProps, State>
               ))}
             </NativeSelect>
             <Button variant="contained" className="m-2" onClick={this.addProject}>
+              <Add className="mr-1" />
               Add
             </Button>
 
             {projectId && (
               <>
-                <Button variant="contained" onClick={this.deleteProject}>
+                <Button variant="contained" color="secondary" onClick={this.deleteProject}>
+                  <Delete className="mr-1" />
                   Delete
                 </Button>
               </>
