@@ -1,0 +1,57 @@
+{
+  "name": "cbt-screenshot-react",
+  "version": "1.0.0",
+  "private": true,
+  "main": "app/main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "cross-env BROWSER=none react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "lint": "eslint --ext ts --ext tsx --quiet src"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.3.0",
+    "@material-ui/icons": "^4.2.1",
+    "bson": "^4.0.2",
+    "cbt-screenshot-common": "file:../common",
+    "noty": "^3.2.0-beta",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-router-dom": "^5.0.1",
+    "react-scripts": "3.0.1",
+    "react-split-pane": "^0.1.87",
+    "sweetalert2": "^8.14.0",
+    "typescript": "3.5.3"
+  },
+  "devDependencies": {
+    "@types/bson": "^4.0.0",
+    "@types/electron": "^1.6.10",
+    "@types/jest": "24.0.15",
+    "@types/node": "12.6.8",
+    "@types/react-dom": "16.8.5",
+    "@types/react-router-dom": "^4.3.4",
+    "@types/react": "16.8.23",
+    "@typescript-eslint/eslint-plugin": "^1.13.0",
+    "@typescript-eslint/parser": "^1.13.0",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-react": "^7.14.3",
+    "node-sass": "^4.12.0",
+    "prettier": "^1.18.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

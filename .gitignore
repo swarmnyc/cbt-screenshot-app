@@ -8,13 +8,9 @@ node_modules
 # testing
 /coverage
 
-
-
 # misc
-/dist
-/build
-/app/src
-/temp
+dist
+build
 
 .DS_Store
 .env
