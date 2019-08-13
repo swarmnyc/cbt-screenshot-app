@@ -47,6 +47,15 @@ export default class SettingConfig extends React.Component<Props, State> {
           />
 
           <TextField
+            id="project-authPassword"
+            label="CBT Auth Password"
+            className="mt-3"
+            fullWidth
+            defaultValue={project.authPassword}
+            onBlur={this.onConfigChanged}
+          />
+
+          <TextField
             id="project-authKey"
             label="CBT Auth Key"
             className="mt-3"

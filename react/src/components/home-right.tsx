@@ -41,10 +41,17 @@ export default class HomeRight extends React.Component<Props, State> {
     }
 
     if (this.props.page) {
-      if (this.state.screenshotVersion) {
-        var { show_results_public_url: resultUrl } = this.state.screenshotVersion
+      if (this.props.page.screenshot) {
+        var { show_results_web_url: resultUrl } = this.state.screenshotVersion
         resultUrl += "?size=small&type=fullpage"
-        return <webview src={resultUrl} style={{ width: "100%", height: "100%" }} useragent={UserAgent} />
+        return (
+          <webview
+            ref={this.onWebViewRef}
+            src={resultUrl}
+            style={{ width: "100%", height: "100%" }}
+            useragent={UserAgent}
+          />
+        )
       } else {
         return (
           <Box className="screen-center">
@@ -90,5 +97,65 @@ export default class HomeRight extends React.Component<Props, State> {
         this.setState({ status: LoadStatus.Error })
         console.error("Fetch CBT Page Failed", error)
       })
+  }
+
+  private onWebViewRef = (ref: HTMLWebViewElement) => {
+    console.log("onWebViewRef", ref)
+    if (ref) {
+      ref.addEventListener("dom-ready", () => {
+        var project = this.props.project
+
+        if (ref.getURL().includes("/login")) {
+          // for login page
+          ref.executeJavaScript(`
+          $("#inputEmail").val("${project.authName}")
+          $("#inputEmail").trigger("change")
+          $("#inputPassword").val("${project.authPassword}")
+          $("#inputPassword").trigger("change")
+          $("#login-btn").click()
+          `)
+        } else {
+          // for result page
+
+          ref.executeJavaScript(`
+          var check1 = setInterval(()=>{
+            if ($(".screenshot-results").size() > 0) {
+              $(".app-navbar").hide()
+              $(".sidenav").hide()
+              $(".wrapper").css("padding-top", "0px")
+              $(".wrapper").removeClass("has-notice-bar")
+  
+              clearInterval(check1)
+            }
+          }, 100)
+  
+          var check2 = setInterval(()=>{
+            if ($(".has-sidenav").size() > 0) {
+              $(".has-sidenav").removeClass("has-sidenav")
+  
+              clearInterval(check2)
+            }
+          }, 300)
+  
+          var check3 = setInterval(()=>{
+            if ($(".sidenav-expanded").size() > 0) {
+              $(".sidenav-expanded").removeClass("sidenav-expanded")
+              clearInterval(check3)
+            }
+          }, 300)
+  
+          $(window).scroll(function() {
+            if ($(".will-stick").size() > 0) {
+              if ($(".will-stick").hasClass("sticky")){
+                $(".will-stick").hide()
+              }else{
+                $(".will-stick").show()
+              }
+            }
+          });
+          `)
+        }
+      })
+    }
   }
 }

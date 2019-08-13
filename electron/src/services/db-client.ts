@@ -87,7 +87,7 @@ class DbClient {
     await this.pageCollection.deleteMany({ projectId: id })
   }
 
-  createPage(page: Page): Promise<Project> {
+  createPage(page: Page): Promise<void> {
     page._id = ObjectId.createFromHexString(page._id)
     page.projectId = ObjectId.createFromHexString(page.projectId)
 
@@ -100,14 +100,14 @@ class DbClient {
         if (error) {
           reject(error)
         } else {
-          resolve(page._id.toString())
+          resolve()
         }
       })
     })
   }
 
   updatePageProperty(pageId: string, prop: string, value: any): Promise<void> {
-    var id = ObjectId.createFromHexString(pageId)
+    var _id = ObjectId.createFromHexString(pageId)
     if (prop == "page" && typeof value == "string") {
       value = value.toLowerCase()
     }
@@ -115,7 +115,7 @@ class DbClient {
     return this.pageCollection
       .updateOne(
         {
-          _id: id
+          _id
         },
         {
           $set: {
@@ -129,6 +129,40 @@ class DbClient {
   async deletePage(pageId: string): Promise<void> {
     var id = ObjectId.createFromHexString(pageId)
     await this.pageCollection.deleteOne({ _id: id })
+  }
+
+  async bulkEditPages(inserts: Page[], updates: Page[]): Promise<void> {
+    if (inserts && inserts.length > 0) {
+      inserts.forEach(page => {
+        page._id = ObjectId.createFromHexString(page._id)
+        page.projectId = ObjectId.createFromHexString(page.projectId)
+      })
+
+      await this.pageCollection.insertMany(inserts)
+    }
+
+    if (updates && updates.length > 0) {
+      await Promise.all(
+        updates.map(page => {
+          var _id = ObjectId.createFromHexString(page._id)
+          var { name, folder, mobileResultId, desktopResultId } = page
+
+          return this.pageCollection.updateOne(
+            {
+              _id
+            },
+            {
+              $set: {
+                name,
+                folder,
+                mobileResultId,
+                desktopResultId
+              }
+            }
+          )
+        })
+      )
+    }
   }
 
   private async initData(): Promise<InitializeResult> {

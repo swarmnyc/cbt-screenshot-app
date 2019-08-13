@@ -2,6 +2,7 @@ export declare type ObjectId = any
 
 /** Client to Main channels */
 export enum C2MChannel {
+  BulkEditPages = "BulkEditPages",
   CreatePage = "CreatePage",
   CreateProject = "CreateProject",
   DeletePage = "DeletePage",
@@ -34,6 +35,7 @@ export interface Project {
   name: string
   domain: string
   authName: string
+  authPassword: string
   authKey: string
   desktopBrowsers: string[]
   mobileBrowsers: string[]

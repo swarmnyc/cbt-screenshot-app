@@ -12,6 +12,7 @@ export class IpcServer {
     ipcMain.on(C2MChannel.CreatePage, this.createPage)
     ipcMain.on(C2MChannel.UpdatePageProperty, this.updatePageProperty)
     ipcMain.on(C2MChannel.DeletePage, this.deletePage)
+    ipcMain.on(C2MChannel.BulkEditPages, this.bulkEditPages)
   }
 
   initialize = async (_: Event, connectionString: string) => {
@@ -40,6 +41,10 @@ export class IpcServer {
 
   deletePage = async (_: Event, pageId: string) => {
     this.execute(C2MChannel.DeletePage, () => dbClient.deletePage(pageId))
+  }
+
+  bulkEditPages = async (_: Event, inserts: Page[], updates: Page[]) => {
+    this.execute(C2MChannel.BulkEditPages, () => dbClient.bulkEditPages(inserts, updates))
   }
 
   private execute(channel: C2MChannel, body: () => Promise<any>): void {

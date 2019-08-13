@@ -15,6 +15,7 @@
     "@material-ui/icons": "^4.2.1",
     "bson": "^4.0.2",
     "cbt-screenshot-common": "file:../common",
+    "noty": "^3.2.0-beta",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.1",
