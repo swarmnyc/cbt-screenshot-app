@@ -3,6 +3,13 @@
   "version": "1.2.0",
   "private": true,
   "main": "./src/main.ts",
+  "repository": {
+    "url": "https://github.com/swarmnyc/cbt-screenshot-app"
+  },
+  "author": {
+    "email": "dev@swarmnyc.com",
+    "name": "SWARM"
+  },
   "scripts": {
     "start": "cross-env NODE_ENV=development electron --require ts-node/register .",
     "prebuild": "rimraf build && tsc",

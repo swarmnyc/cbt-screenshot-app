@@ -23,7 +23,6 @@
     "target": "dmg"
   },
   "dmg": {
-    "sign": false,
     "contents": [
       {
         "x": 140,
