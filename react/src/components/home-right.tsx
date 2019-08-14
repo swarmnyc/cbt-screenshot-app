@@ -100,9 +100,10 @@ export default class HomeRight extends React.Component<Props, State> {
   }
 
   private onWebViewRef = (ref: HTMLWebViewElement) => {
-    console.log("onWebViewRef", ref)
     if (ref) {
       ref.addEventListener("dom-ready", () => {
+        console.log("dom-ready", ref.getURL())
+
         var project = this.props.project
 
         if (ref.getURL().includes("/login")) {
@@ -119,30 +120,20 @@ export default class HomeRight extends React.Component<Props, State> {
 
           ref.executeJavaScript(`
           var check1 = setInterval(()=>{
-            if ($(".screenshot-results").size() > 0) {
+            if ($(".sidenav:visible").size() > 0) {
               $(".app-navbar").hide()
               $(".sidenav").hide()
               $(".wrapper").css("padding-top", "0px")
               $(".wrapper").removeClass("has-notice-bar")
-  
-              clearInterval(check1)
+              $(".has-sidenav").removeClass("has-sidenav sidenav-expanded")
             }
-          }, 100)
-  
+          }, 500)
+
           var check2 = setInterval(()=>{
-            if ($(".has-sidenav").size() > 0) {
-              $(".has-sidenav").removeClass("has-sidenav")
-  
-              clearInterval(check2)
+            if ($(".has-notice-bar").size() > 0) {
+              $(".has-notice-bar").removeClass("has-notice-bar")
             }
-          }, 300)
-  
-          var check3 = setInterval(()=>{
-            if ($(".sidenav-expanded").size() > 0) {
-              $(".sidenav-expanded").removeClass("sidenav-expanded")
-              clearInterval(check3)
-            }
-          }, 300)
+          }, 1000)
   
           $(window).scroll(function() {
             if ($(".will-stick").size() > 0) {
