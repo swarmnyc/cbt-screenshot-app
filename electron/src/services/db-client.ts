@@ -41,11 +41,17 @@ class DbClient {
   }
 
   getProjects(): Promise<Project[]> {
-    return this.projectCollection.find().toArray()
+    return this.projectCollection
+      .find()
+      .sort({ name: 1 })
+      .toArray()
   }
 
   getPages(): Promise<Page[]> {
-    return this.pageCollection.find().toArray()
+    return this.pageCollection
+      .find()
+      .sort({ path: 1 })
+      .toArray()
   }
 
   createProject(projectName: string): Promise<Project> {

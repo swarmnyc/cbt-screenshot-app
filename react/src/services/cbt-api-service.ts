@@ -2,7 +2,9 @@ import { Page, Project, CbtScreenshot } from "cbt-screenshot-common"
 
 class CbtApiService {
   getScreenshot(project: Project, page: Page): Promise<CbtScreenshot> {
-    var url = `https://crossbrowsertesting.com/api/v3/screenshots/${page.resultId}`
+    //TODO: will change to use desktopResultId or page.mobileResultId
+    var resultId = page.resultId || page.desktopResultId || page.mobileResultId
+    var url = `https://crossbrowsertesting.com/api/v3/screenshots/${resultId}`
     var options: RequestInit = {
       method: "GET",
       headers: {

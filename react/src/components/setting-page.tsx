@@ -19,6 +19,7 @@ import React from "react"
 import dataCache from "services/data-cache"
 import ipcClient from "services/ipc-client"
 import { showErrorMessage } from "utils/error-display"
+import SearchBox from "./search-box"
 
 interface Props {
   project: Project
@@ -32,7 +33,7 @@ interface State {
 export default class SettingPage extends React.Component<Props, State> {
   bulkEditCsv: string
   newPage: Page
-  query: string
+  searchStr: string
 
   constructor(props: Props) {
     super(props)
@@ -51,13 +52,18 @@ export default class SettingPage extends React.Component<Props, State> {
           <Typography className="flex-grow">Pages</Typography>
 
           {!bulkEditMode && (
-            <Button
-              onClick={() => {
-                this.setState({ bulkEditMode: true })
-              }}
-            >
-              Bulk Edit
-            </Button>
+            <>
+              <SearchBox onChanged={this.onSearch} value={this.searchStr} />
+              <Button
+                variant="outlined"
+                className="ml-2"
+                onClick={() => {
+                  this.setState({ bulkEditMode: true })
+                }}
+              >
+                Bulk Edit
+              </Button>
+            </>
           )}
         </Box>
         <Paper className="m-2 p-2">{bulkEditMode ? this.renderBulkEditMode() : this.renderNormalMode()}</Paper>
@@ -195,6 +201,12 @@ export default class SettingPage extends React.Component<Props, State> {
     )
   }
 
+  private onSearch = (search: string) => {
+    this.searchStr = search.toLowerCase()
+
+    this.setState({ pages: this.getPages(false) })
+  }
+
   private onSave = () => {
     ipcClient
       .bulkPageEdit(this.props.project, this.bulkEditCsv)
@@ -249,8 +261,11 @@ export default class SettingPage extends React.Component<Props, State> {
   private getPages(newPage: boolean): Page[] {
     var pages = dataCache.projectPageMap.get(this.props.project._id)
 
-    if (this.query) {
-      pages = pages.filter(p => p.path.includes(this.query.toLowerCase()))
+    if (this.searchStr) {
+      pages = pages.filter(p => {
+        var target = `${p.path}|${p.name}`.toLowerCase()
+        return target.includes(this.searchStr)
+      })
     }
 
     if (newPage) {
