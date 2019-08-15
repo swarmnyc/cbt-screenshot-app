@@ -7,10 +7,13 @@ node_modules
 
 # testing
 /coverage
+/lambda/src/Test.cs
 
 # misc
 dist
 build
+bin
+obj
 
 .DS_Store
 .env

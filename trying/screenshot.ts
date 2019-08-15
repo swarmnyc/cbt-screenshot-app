@@ -2,7 +2,7 @@ import { Builder, By, until, WebDriver, IWebDriverCookie, IWebDriverOptionsCooki
 import fs from "fs"
 import { Driver } from "selenium-webdriver/chrome"
 import dotenv from "dotenv"
-import { Page } from "../src/types"
+import { Page } from "../common/types"
 import * as rp from "request-promise"
 
 dotenv.config()

@@ -9,7 +9,7 @@ export enum C2MChannel {
   DeleteProject = "DeleteProject",
   Initialize = "Initialize",
   UpdatePageProperty = "UpdatePageProperty",
-  UpdateProjectProperty = "UpdateProjectProperty",
+  UpdateProjectProperty = "UpdateProjectProperty"
 }
 
 /** Main to Client channels */
@@ -52,9 +52,33 @@ export interface Page {
   mobileResultId?: string
 }
 
+export interface Task {
+  _id: ObjectId | string
+  projectId: ObjectId | string
+  pageId: ObjectId | string
+  state: TaskState
+  type: TaskType
+  createdAt: Date
+  executedAt?: Date
+  finishedAt?: Date
+}
+
 export interface InitializeResult {
   projects?: Project[]
   pages?: Page[]
+}
+
+export enum TaskState {
+  Pending = "Pending",
+  Executing = "Executing",
+  Executed = "Executed",
+  Canceled = "Canceled",
+  Error = "Error"
+}
+
+export enum TaskType {
+  Desktop = "Desktop",
+  Mobile = "Mobile"
 }
 
 export type ActionFunc = () => void

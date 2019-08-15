@@ -9,12 +9,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.510.0",
     "dotenv": "^8.0.0",
+    "mongodb": "^3.3.0",
     "request-promise": "^4.2.4",
     "selenium-webdriver": "^4.0.0-alpha.4"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
+    "@types/mongodb": "^3.2.2",
     "@types/request-promise": "^4.1.44",
     "@types/selenium-webdriver": "^4.0.1",
     "ts-node": "^8.3.0"
