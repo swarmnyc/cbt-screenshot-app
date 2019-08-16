@@ -1,4 +1,4 @@
-import { Page, Project, CbtScreenshot } from "cbt-screenshot-common"
+import { Project, CbtScreenshot } from "cbt-screenshot-common"
 
 class CbtApiService {
   getScreenshot(project: Project, resultId: string): Promise<CbtScreenshot> {
