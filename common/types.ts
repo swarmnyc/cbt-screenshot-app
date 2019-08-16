@@ -47,7 +47,6 @@ export interface Page {
   name?: string
   path?: string
   folder?: string
-  resultId?: number // TODO: remove it
   desktopResultId?: string
   mobileResultId?: string
 }

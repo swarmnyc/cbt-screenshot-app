@@ -8,6 +8,7 @@ node_modules
 # testing
 /coverage
 /lambda/src/Test.cs
+/trying
 
 # misc
 dist

@@ -37,10 +37,15 @@ const template: (MenuItemConstructorOptions | MenuItem)[] = [
     ]
   },
   {
-    label: "Help",
+    label: "View",
     submenu: [
       { role: "reload" },
       { role: "forcereload" },
+    ]
+  },
+  {
+    label: "Help",
+    submenu: [
       { role: "toggledevtools" },
       { type: "separator" },
       {

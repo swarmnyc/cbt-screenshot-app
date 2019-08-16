@@ -10,6 +10,8 @@ const UserAgent = "Mozilla/5.0"
 interface Props {
   project: Project
   page: PageView
+  mobileMode: boolean
+  onResultUrlFetched: (url: string) => void
 }
 
 interface State {
@@ -22,13 +24,13 @@ export default class HomeRight extends React.Component<Props, State> {
   state: State = { status: LoadStatus.Loading }
 
   componentWillMount(): void {
-    this.fetchCbtScreenshot(this.props.project, this.props.page)
+    this.fetchCbtScreenshot(this.props.project, this.props.page, this.props.mobileMode)
   }
 
   componentWillReceiveProps(nextProps: Readonly<Props>): void {
-    if (this.props.page !== nextProps.page) {
+    if (this.props.page !== nextProps.page || this.props.mobileMode !== nextProps.mobileMode) {
       this.setState({ status: LoadStatus.Loading })
-      this.fetchCbtScreenshot(nextProps.project, nextProps.page)
+      this.fetchCbtScreenshot(nextProps.project, nextProps.page, nextProps.mobileMode)
     }
   }
 
@@ -68,30 +70,44 @@ export default class HomeRight extends React.Component<Props, State> {
     }
   }
 
-  fetchCbtScreenshot(project: Project, page: PageView): void {
-    if (page == null || !page.resultId) {
-      this.setState({ status: LoadStatus.Loaded, screenshot: null, screenshotVersion: null })
+  private fetchCbtScreenshot = (project: Project, page: PageView, mobileMode: boolean): void => {
+    if (!page) {
+      this.setState({ status: LoadStatus.Loaded, screenshot: null, screenshotVersion: null }, this.onVersionChanged)
       return
     }
 
-    if (page.screenshot) {
-      this.setState({
-        status: LoadStatus.Loaded,
-        screenshot: page.screenshot,
-        screenshotVersion: page.screenshot.versions[page.screenshot.versions.length - 1]
-      })
+    var resultId = mobileMode ? page.mobileResultId : page.desktopResultId
+
+    if (!resultId) {
+      this.setState({ status: LoadStatus.Loaded, screenshot: null, screenshotVersion: null }, this.onVersionChanged)
+      return
+    }
+
+    if (page.screenshot && page.screenshot.screenshot_test_id.toString() === resultId) {
+      this.setState(
+        {
+          status: LoadStatus.Loaded,
+          screenshot: page.screenshot,
+          screenshotVersion: page.screenshot.versions[page.screenshot.versions.length - 1]
+        },
+        this.onVersionChanged
+      )
       return
     }
 
     cbtApiService
-      .getScreenshot(project, page)
+      .getScreenshot(project, resultId)
       .then(screenshot => {
         page.screenshot = screenshot
-        this.setState({
-          status: LoadStatus.Loaded,
-          screenshot,
-          screenshotVersion: screenshot.versions[screenshot.versions.length - 1]
-        })
+
+        this.setState(
+          {
+            status: LoadStatus.Loaded,
+            screenshot,
+            screenshotVersion: screenshot.versions[screenshot.versions.length - 1]
+          },
+          this.onVersionChanged
+        )
       })
       .catch(error => {
         this.setState({ status: LoadStatus.Error })
@@ -119,19 +135,14 @@ export default class HomeRight extends React.Component<Props, State> {
           // for result page
 
           ref.executeJavaScript(`
-          var check1 = setInterval(()=>{
-            if ($(".sidenav:visible").size() > 0) {
+          var check = setInterval(()=>{
+            if ($(".sidenav:visible, .sidenav-expanded, .has-notice-bar").size() > 0) {
               $(".app-navbar").hide()
               $(".sidenav").hide()
               $(".wrapper").css("padding-top", "0px")
-              $(".wrapper").removeClass("has-notice-bar")
-              $(".has-sidenav").removeClass("has-sidenav sidenav-expanded")
-            }
-          }, 500)
-
-          var check2 = setInterval(()=>{
-            if ($(".has-notice-bar").size() > 0) {
               $(".has-notice-bar").removeClass("has-notice-bar")
+              $(".has-sidenav").removeClass("has-sidenav")
+              $(".sidenav-expanded").removeClass("sidenav-expanded")
             }
           }, 1000)
   
@@ -147,6 +158,14 @@ export default class HomeRight extends React.Component<Props, State> {
           `)
         }
       })
+    }
+  }
+
+  private onVersionChanged = () => {
+    if (this.state.screenshotVersion) {
+      this.props.onResultUrlFetched(this.state.screenshotVersion.show_results_web_url)
+    } else {
+      this.props.onResultUrlFetched(null)
     }
   }
 }
