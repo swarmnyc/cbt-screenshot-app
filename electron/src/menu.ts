@@ -38,10 +38,7 @@ const template: (MenuItemConstructorOptions | MenuItem)[] = [
   },
   {
     label: "View",
-    submenu: [
-      { role: "reload" },
-      { role: "forcereload" },
-    ]
+    submenu: [{ role: "reload" }, { role: "forcereload" }]
   },
   {
     label: "Help",
@@ -62,5 +59,7 @@ const template: (MenuItemConstructorOptions | MenuItem)[] = [
   }
 ]
 
-const menu = Menu.buildFromTemplate(template)
-Menu.setApplicationMenu(menu)
+export function createMenu() {
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
+}

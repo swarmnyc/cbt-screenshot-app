@@ -6,7 +6,7 @@ import { IpcServer } from "./services/ipc-server"
 let mainWindow: BrowserWindow
 let ipcServer: IpcServer
 
-export function createWindow() {
+export function createWindow(): BrowserWindow {
   mainWindow = new BrowserWindow({
     width: 1024,
     height: 768,
@@ -40,4 +40,6 @@ export function createWindow() {
   mainWindow.once("ready-to-show", () => {
     mainWindow.show()
   })
+
+  return mainWindow
 }
