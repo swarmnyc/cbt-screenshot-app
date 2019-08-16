@@ -125,5 +125,13 @@ namespace CbtScreenshotTask {
 
       await taskCollection.UpdateOneAsync(filter, update);
     }
+
+    public Task MakeTaskError(AppTask task) {
+      var filter = Builders<AppTask>.Filter.Eq(d => d.Id, task.Id);
+      var update = Builders<AppTask>.Update.Set(d => d.State, AppTaskState.Error)
+        .Set(d => d.FinishedAt, DateTime.UtcNow);
+
+      return taskCollection.UpdateOneAsync(filter, update);
+    }
   }
 }

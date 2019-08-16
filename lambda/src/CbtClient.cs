@@ -62,7 +62,9 @@ namespace CbtScreenshotTask {
       HttpResponseMessage res = await client.PostAsync(apiUri, content);
 
       if (tryCount > 3) {
-        throw new Exception($"Cannot take screenshot of {targetUrl}");
+        Logger.Log($"Cannot take screenshot of {targetUrl}");
+
+        return null;
       }
 
       if (res.StatusCode != HttpStatusCode.OK) {

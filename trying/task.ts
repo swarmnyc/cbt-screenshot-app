@@ -13,9 +13,17 @@ mongoClient.connect(async error => {
   var tasksCollection = db.collection<Task>("tasks")
 
   var pages = await pageCollection
-    .find()
+    .find({
+      $or: [
+        {
+          mobileResultId: ""
+        },
+        {
+          mobileResultId: null
+        }
+      ]
+    })
     .sort({ path: 1 })
-    .limit(3)
     .toArray()
 
   await Promise.all(
@@ -38,4 +46,6 @@ mongoClient.connect(async error => {
       ])
     )
   )
+
+  mongoClient.close()
 })
