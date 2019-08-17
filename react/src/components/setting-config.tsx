@@ -26,7 +26,9 @@ export default class SettingConfig extends React.Component<Props, State> {
 
     return (
       <>
-        <Typography className="mx-3 my-2">Configs</Typography>
+        <Typography variant="h5" className="mx-3 my-2">
+          Configs
+        </Typography>
 
         <Paper className="m-2 p-2">
           <TextField
@@ -70,6 +72,42 @@ export default class SettingConfig extends React.Component<Props, State> {
             className="mt-3"
             fullWidth
             defaultValue={project.domain}
+            onBlur={this.onConfigChanged}
+          />
+
+          <TextField
+            id="project-awsKey"
+            label="AWS Access Key"
+            className="mt-3"
+            fullWidth
+            defaultValue={project.awsKey}
+            onBlur={this.onConfigChanged}
+          />
+
+          <TextField
+            id="project-awsKeySecret"
+            label="AWS Access Key Secret"            
+            className="mt-3"
+            fullWidth
+            defaultValue={project.awsKeySecret}
+            onBlur={this.onConfigChanged}
+          />
+
+          <TextField
+            id="project-awsKeySecret"
+            label="AWS Region"
+            className="mt-3"
+            fullWidth
+            defaultValue={project.awsRegion}
+            onBlur={this.onConfigChanged}
+          />
+
+          <TextField
+            id="project-awsSqsUrl"
+            label="AWS SQS Url"
+            className="mt-3"
+            fullWidth
+            defaultValue={project.awsSqsUrl}
             onBlur={this.onConfigChanged}
           />
 

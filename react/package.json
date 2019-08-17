@@ -13,6 +13,7 @@
   "dependencies": {
     "@material-ui/core": "^4.3.0",
     "@material-ui/icons": "^4.2.1",
+    "@types/react-timeago": "^4.1.1",
     "bson": "^4.0.2",
     "cbt-screenshot-common": "file:../common",
     "debounce": "^1.2.0",
@@ -22,6 +23,7 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
     "react-split-pane": "^0.1.87",
+    "react-timeago": "^4.4.0",
     "sweetalert2": "^8.14.0",
     "typescript": "3.5.3"
   },

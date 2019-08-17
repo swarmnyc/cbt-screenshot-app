@@ -9,7 +9,8 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography
+  Typography,
+  Checkbox
 } from "@material-ui/core"
 import { Delete } from "@material-ui/icons"
 import { ObjectId } from "bson"
@@ -21,12 +22,19 @@ import ipcClient from "services/ipc-client"
 import { showErrorMessage } from "utils/error-display"
 import SearchBox from "./search-box"
 
+interface SelectablePage extends Page {
+  isSelected?: boolean
+}
+
 interface Props {
   project: Project
 }
 
 interface State {
-  pages?: Page[]
+  pages?: SelectablePage[]
+  selectedPages: number
+  isPartialSelected?: boolean
+  isAllSelected?: boolean
   bulkEditMode?: boolean
 }
 
@@ -39,7 +47,10 @@ export default class SettingPage extends React.Component<Props, State> {
     super(props)
 
     this.state = {
-      pages: this.getPages(true)
+      pages: this.getPages(true),
+      selectedPages: 0,
+      isPartialSelected: false,
+      isAllSelected: false
     }
   }
 
@@ -49,11 +60,13 @@ export default class SettingPage extends React.Component<Props, State> {
     return (
       <>
         <Box className="mx-3 mt-4 tb-2" style={{ display: "flex", alignItems: "center" }}>
-          <Typography className="flex-grow">Pages</Typography>
+          <Typography variant="h5" className="flex-grow">
+            Pages
+          </Typography>
 
           {!bulkEditMode && (
             <>
-              <SearchBox onChanged={this.onSearch} value={this.searchStr} />
+              <SearchBox onChanged={this.search} value={this.searchStr} />
               <Button
                 variant="outlined"
                 className="ml-2"
@@ -72,87 +85,108 @@ export default class SettingPage extends React.Component<Props, State> {
   }
 
   renderNormalMode(): React.ReactElement {
+    var { pages, selectedPages, isPartialSelected, isAllSelected } = this.state
+
     return (
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell align="right" style={{ width: "67px" }}>
-              NO.
-            </TableCell>
-            <TableCell align="left">Path</TableCell>
-            <TableCell align="left">Name</TableCell>
-            <TableCell align="left">Folder</TableCell>
-            <TableCell align="right" style={{ width: "150px" }}>
-              Desktop RId
-            </TableCell>
-            <TableCell align="right" style={{ width: "150px" }}>
-              Mobile RId
-            </TableCell>
-            <TableCell style={{ width: "50px" }}></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {this.state.pages.map((page, index) => {
-            return (
-              <TableRow key={page._id}>
-                <TableCell align="right">{page === this.newPage ? "new" : index + 1}</TableCell>
-                <TableCell align="left">
-                  <input
-                    id={"page-" + page._id + "-path"}
-                    className="borderless w-100"
-                    type="text"
-                    defaultValue={page.path}
-                    onBlur={this.onPagePropChanged}
-                  />
-                </TableCell>
-                <TableCell align="left">
-                  <input
-                    id={"page-" + page._id + "-name"}
-                    className="borderless w-100"
-                    type="text"
-                    defaultValue={page.name}
-                    onBlur={this.onPagePropChanged}
-                  />
-                </TableCell>
-                <TableCell align="left">
-                  <input
-                    id={"page-" + page._id + "-folder"}
-                    className="borderless w-100"
-                    type="text"
-                    defaultValue={page.folder}
-                    onBlur={this.onPagePropChanged}
-                  />
-                </TableCell>
-                <TableCell align="right">
-                  <input
-                    id={"page-" + page._id + "-desktopResultId"}
-                    className="borderless w-100 text-right"
-                    type="text"
-                    defaultValue={page.desktopResultId}
-                    onBlur={this.onPagePropChanged}
-                  />
-                </TableCell>
-                <TableCell align="right">
-                  <input
-                    id={"page-" + page._id + "-mobileResultId"}
-                    className="borderless w-100 text-right"
-                    type="text"
-                    defaultValue={page.mobileResultId}
-                    onBlur={this.onPagePropChanged}
-                  />
-                </TableCell>
-                <TableCell align="right">
-                  {page !== this.newPage && (
-                    <IconButton id={"page-" + page._id + "-delete"} size="small" onClick={this.onDeletePage}>
-                      <Delete />
-                    </IconButton>
-                  )}
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+      <>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell padding="checkbox">
+                <Checkbox indeterminate={isPartialSelected} checked={isAllSelected} onChange={this.handleSelectAll} />
+              </TableCell>
+              <TableCell align="right" style={{ width: "67px" }}>
+                NO.
+              </TableCell>
+              <TableCell align="left">Path</TableCell>
+              <TableCell align="left">Name</TableCell>
+              <TableCell align="left">Folder</TableCell>
+              <TableCell align="right" style={{ width: "150px" }}>
+                Desktop RId
+              </TableCell>
+              <TableCell align="right" style={{ width: "150px" }}>
+                Mobile RId
+              </TableCell>
+              <TableCell style={{ width: "50px" }}></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {pages.map((page, index) => {
+              return (
+                <TableRow key={page._id}>
+                  <TableCell padding="checkbox">
+                    {page !== this.newPage && (
+                      <Checkbox
+                        key={page._id + "-select-" + (page.isSelected ? "1" : "0")}
+                        checked={page.isSelected}
+                        onChange={() => this.handleSelect(page)}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell align="right">{page === this.newPage ? "new" : index + 1}</TableCell>
+                  <TableCell align="left">
+                    <input
+                      id={"page-" + page._id + "-path"}
+                      className="borderless w-100"
+                      type="text"
+                      defaultValue={page.path}
+                      onBlur={this.changePageProp}
+                    />
+                  </TableCell>
+                  <TableCell align="left">
+                    <input
+                      id={"page-" + page._id + "-name"}
+                      className="borderless w-100"
+                      type="text"
+                      defaultValue={page.name}
+                      onBlur={this.changePageProp}
+                    />
+                  </TableCell>
+                  <TableCell align="left">
+                    <input
+                      id={"page-" + page._id + "-folder"}
+                      className="borderless w-100"
+                      type="text"
+                      defaultValue={page.folder}
+                      onBlur={this.changePageProp}
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <input
+                      id={"page-" + page._id + "-desktopResultId"}
+                      className="borderless w-100 text-right"
+                      type="text"
+                      defaultValue={page.desktopResultId}
+                      onBlur={this.changePageProp}
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <input
+                      id={"page-" + page._id + "-mobileResultId"}
+                      className="borderless w-100 text-right"
+                      type="text"
+                      defaultValue={page.mobileResultId}
+                      onBlur={this.changePageProp}
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    {page !== this.newPage && (
+                      <IconButton id={"page-" + page._id + "-delete"} size="small" onClick={this.deletePage}>
+                        <Delete />
+                      </IconButton>
+                    )}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+        <Box className="mt-3">
+          <Button variant="contained" color="primary" onClick={this.takeScreenShots} disabled={selectedPages === 0}>
+            Take Screenshots ({selectedPages} pages)
+          </Button>
+        </Box>
+      </>
     )
   }
 
@@ -184,7 +218,7 @@ export default class SettingPage extends React.Component<Props, State> {
         </Typography>
 
         <Box>
-          <Button variant="contained" color="primary" className="mr-2" onClick={this.onSave}>
+          <Button variant="contained" color="primary" className="mr-2" onClick={this.save}>
             Save
           </Button>
 
@@ -201,13 +235,13 @@ export default class SettingPage extends React.Component<Props, State> {
     )
   }
 
-  private onSearch = (search: string) => {
+  private search = (search: string) => {
     this.searchStr = search.toLowerCase()
 
-    this.setState({ pages: this.getPages(false) })
+    this.setState({ pages: this.getPages(false), isAllSelected: false, isPartialSelected: false })
   }
 
-  private onSave = () => {
+  private save = () => {
     ipcClient
       .bulkPageEdit(this.props.project, this.bulkEditCsv)
       .then(result => {
@@ -224,7 +258,31 @@ export default class SettingPage extends React.Component<Props, State> {
       .catch(showErrorMessage)
   }
 
-  private onPagePropChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+  private takeScreenShots = () => {
+    var pageIds = this.state.pages.filter(p => p !== this.newPage && p.isSelected).map(p => p._id)
+
+    ipcClient
+      .newTasks(this.props.project, pageIds)
+      .then(() => {
+        new Noty({
+          theme: "nest",
+          type: "success",
+          layout: "topRight",
+          timeout: 2000,
+          text: `Tasks Created`
+        }).show()
+
+        this.setState({
+          pages: this.getPages(false),
+          selectedPages: 0,
+          isPartialSelected: false,
+          isAllSelected: false
+        })
+      })
+      .catch(showErrorMessage)
+  }
+
+  private changePageProp = (event: React.ChangeEvent<HTMLInputElement>) => {
     var arr = event.target.id.split("-")
     var pageId = arr[1]
     var prop = arr[2] as keyof Page
@@ -242,7 +300,7 @@ export default class SettingPage extends React.Component<Props, State> {
     }
   }
 
-  private onDeletePage = (event: React.MouseEvent<HTMLButtonElement>) => {
+  private deletePage = (event: React.MouseEvent<HTMLButtonElement>) => {
     var arr = event.currentTarget.id.split("-")
     var pageId = arr[1]
     ipcClient.deletePage(dataCache.pageMap.get(pageId)).then(() => {
@@ -258,8 +316,12 @@ export default class SettingPage extends React.Component<Props, State> {
     })
   }
 
-  private getPages(newPage: boolean): Page[] {
-    var pages = dataCache.projectPageMap.get(this.props.project._id)
+  private getPages = (newPage: boolean): SelectablePage[] => {
+    var pages: SelectablePage[] = dataCache.projectPageMap.get(this.props.project._id)
+
+    pages.forEach(p => {
+      p.isSelected = false
+    })
 
     if (this.searchStr) {
       pages = pages.filter(p => {
@@ -273,5 +335,35 @@ export default class SettingPage extends React.Component<Props, State> {
     }
 
     return pages.concat([this.newPage])
+  }
+
+  private handleSelectAll = () => {
+    var pages = this.state.pages
+    var numSelected = pages.filter(page => page.isSelected).length
+    var isSelected = numSelected === 0
+
+    pages.forEach(page => {
+      page.isSelected = isSelected
+    })
+
+    this.setState({
+      pages,
+      selectedPages: isSelected ? pages.length : 0,
+      isPartialSelected: false,
+      isAllSelected: isSelected
+    })
+  }
+
+  private handleSelect = (page: SelectablePage) => {
+    page.isSelected = !page.isSelected
+
+    var numSelected = this.state.pages.filter(d => d.isSelected).length
+    var rowCount = this.state.pages.length
+
+    this.setState({
+      selectedPages: numSelected,
+      isPartialSelected: numSelected > 0 && numSelected < rowCount,
+      isAllSelected: numSelected === rowCount
+    })
   }
 }

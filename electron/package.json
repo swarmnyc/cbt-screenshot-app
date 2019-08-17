@@ -1,6 +1,6 @@
 {
   "name": "cbt-screenshot-app",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "main": "./src/main.ts",
   "repository": {
@@ -16,6 +16,7 @@
     "build": "electron-builder"
   },
   "dependencies": {
+    "aws-sdk": "^2.512.0",
     "cbt-screenshot-common": "file:../common",
     "electron-updater": "^4.1.2",
     "mongodb": "^3.3.0-beta2"

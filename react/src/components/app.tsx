@@ -11,6 +11,7 @@ import Error from "./error"
 import Home from "./home"
 import Loading from "./loading"
 import Setting from "./setting"
+import TaskList from "./task-list"
 
 interface State {
   status?: InitStatus
@@ -53,6 +54,7 @@ export default class App extends React.Component<{}, State> {
             <Router history={navigator.history}>
               <Switch>
                 <Route path="/settings" component={Setting} />
+                <Route path="/tasks" component={TaskList} />
                 <Route path="/home" component={Home} />
                 <Route render={this.redirect} />
               </Switch>

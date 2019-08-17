@@ -8,15 +8,22 @@ const template: (MenuItemConstructorOptions | MenuItem)[] = [
     label: "File",
     submenu: [
       {
-        label: "Change Connection",
+        label: "Open Settings",
         click(menuItem: MenuItem, currentWindow: BrowserWindow) {
-          currentWindow.webContents.send(M2CChannel.ChangeConnection)
+          currentWindow.webContents.send(M2CChannel.OpenSettings)
         }
       },
       {
-        label: "Settings",
+        label: "Open Tasks",
         click(menuItem: MenuItem, currentWindow: BrowserWindow) {
-          currentWindow.webContents.send(M2CChannel.OpenSettings)
+          currentWindow.webContents.send(M2CChannel.OpenTasks)
+        }
+      },
+      { type: "separator" },
+      {
+        label: "Change Connection",
+        click(menuItem: MenuItem, currentWindow: BrowserWindow) {
+          currentWindow.webContents.send(M2CChannel.ChangeConnection)
         }
       },
       { type: "separator" },

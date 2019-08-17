@@ -1,16 +1,22 @@
 import { MongoClient, Db, Collection, ObjectId } from "mongodb"
-import { Project, Page, InitializeResult } from "cbt-screenshot-common"
+import { Project, Page, InitializeResult, Task, TaskState, TaskType } from "cbt-screenshot-common"
 
 class DbClient {
   private connectionString: string
   private db: Db
-  private projectCollection: Collection
-  private pageCollection: Collection
+  private projectCollection: Collection<Project>
+  private pageCollection: Collection<Page>
+  private taskCollection: Collection<Task>
 
   constructor() {}
 
   init(connectionString: string): Promise<InitializeResult> {
-    return this.initConnection(connectionString).then(() => this.initData())
+    return this.initConnection(connectionString).then(async () => {
+      var projects = await this.getProjects()
+      var pages = await this.getPages()
+
+      return { projects, pages }
+    })
   }
 
   private initConnection(connectionString: string) {
@@ -30,6 +36,7 @@ class DbClient {
             this.db = mongoClient.db()
             this.projectCollection = this.db.collection("projects")
             this.pageCollection = this.db.collection("pages")
+            this.taskCollection = this.db.collection("tasks")
 
             resolve()
           }
@@ -45,13 +52,7 @@ class DbClient {
       .find()
       .sort({ name: 1 })
       .toArray()
-  }
-
-  getPages(): Promise<Page[]> {
-    return this.pageCollection
-      .find()
-      .sort({ path: 1 })
-      .toArray()
+      .then(result => this.forEachObjectIdToString(result))
   }
 
   createProject(projectName: string): Promise<Project> {
@@ -72,11 +73,11 @@ class DbClient {
   }
 
   updateProjectProperty(projectId: string, prop: string, value: any): Promise<void> {
-    var id = ObjectId.createFromHexString(projectId)
+    var _id = ObjectId.createFromHexString(projectId)
     return this.projectCollection
       .updateOne(
         {
-          _id: id
+          _id
         },
         {
           $set: {
@@ -91,6 +92,14 @@ class DbClient {
     var id = ObjectId.createFromHexString(projectId)
     await this.projectCollection.deleteOne({ _id: id })
     await this.pageCollection.deleteMany({ projectId: id })
+  }
+
+  getPages(): Promise<Page[]> {
+    return this.pageCollection
+      .find()
+      .sort({ path: 1 })
+      .toArray()
+      .then(result => this.forEachObjectIdToString(result, "projectId"))
   }
 
   createPage(page: Page): Promise<void> {
@@ -171,17 +180,79 @@ class DbClient {
     }
   }
 
-  private async initData(): Promise<InitializeResult> {
-    var projects = await this.getProjects()
-    var pages = await this.getPages()
+  async hasExecutingTask(): Promise<boolean> {
+    var tasks = await this.taskCollection
+      .find({
+        state: TaskState.Executing
+      })
+      .toArray()
 
-    this.forEachObjectIdToString(projects)
-    this.forEachObjectIdToString(pages, "projectId")
-
-    return { projects, pages }
+    return tasks.filter(f => Date.now() - f.executedAt.valueOf() < 600_000).length != 0
   }
 
-  private objectIdToString(target: any, ...props: string[]): any {
+  getTasks(): Promise<Task[]> {
+    return this.taskCollection
+      .find({ state: { $in: [TaskState.Pending, TaskState.Executing, TaskState.Error] } })
+      .sort({ path: 1 })
+      .toArray()
+      .then(result => this.forEachObjectIdToString(result, "projectId", "pageId"))
+  }
+
+  async cancelTask(taskId: string): Promise<void> {
+    var _id = ObjectId.createFromHexString(taskId)
+
+    await this.taskCollection.updateOne(
+      { _id },
+      {
+        $set: {
+          state: TaskState.Canceled,
+          finishedAt: new Date()
+        }
+      }
+    )
+  }
+
+  async archiveErrorTask(taskId: string): Promise<void> {
+    var _id = ObjectId.createFromHexString(taskId)
+
+    await this.taskCollection.updateOne(
+      { _id },
+      {
+        $set: {
+          state: TaskState.ErrorArchived
+        }
+      }
+    )
+  }
+
+  async newTasks(project: Project, pageIds: string[]): Promise<void> {
+    var projectId = ObjectId.createFromHexString(project._id)
+
+    await Promise.all(
+      pageIds.map(id => {
+        var pageId = ObjectId.createFromHexString(id)
+
+        return this.taskCollection.insertMany([
+          {
+            projectId,
+            pageId,
+            type: TaskType.Desktop,
+            state: TaskState.Pending,
+            createdAt: new Date()
+          },
+          {
+            projectId,
+            pageId,
+            type: TaskType.Mobile,
+            state: TaskState.Pending,
+            createdAt: new Date()
+          }
+        ])
+      })
+    )
+  }
+
+  private objectIdToString<T>(target: any, ...props: (keyof T)[]): T {
     target._id = target._id.toString()
 
     if (props) {
@@ -193,7 +264,7 @@ class DbClient {
     return target
   }
 
-  private forEachObjectIdToString(targets: any[], ...props: string[]): any[] {
+  private forEachObjectIdToString<T>(targets: any[], ...props: (keyof T)[]): T[] {
     targets.forEach(target => {
       this.objectIdToString(target, ...props)
     })

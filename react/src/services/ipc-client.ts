@@ -1,5 +1,5 @@
 import { IpcRenderer } from "electron"
-import { C2MChannel, InitializeResult, Project, Page } from "cbt-screenshot-common"
+import { C2MChannel, InitializeResult, Project, Page, Task } from "cbt-screenshot-common"
 import dataCache from "./data-cache"
 import { ObjectId } from "bson"
 
@@ -45,7 +45,7 @@ class IpcClient {
     )
   }
 
-  deleteProject(project: Project) {
+  deleteProject(project: Project): Promise<void> {
     return this.createHandler(
       C2MChannel.DeleteProject,
       () => {
@@ -77,7 +77,7 @@ class IpcClient {
     )
   }
 
-  deletePage(page: Page) {
+  deletePage(page: Page): Promise<void> {
     return this.createHandler(
       C2MChannel.DeletePage,
       () => {
@@ -144,6 +144,22 @@ class IpcClient {
         updates
       )
     }
+  }
+
+  getTasks(): Promise<Task[]> {
+    return this.createHandler(C2MChannel.GetTasks, result => result)
+  }
+
+  cancelTask(taskId: string): Promise<void> {
+    return this.createHandler(C2MChannel.CancelTask, () => {}, taskId)
+  }
+
+  archiveErrorTask(taskId: string): Promise<void> {
+    return this.createHandler(C2MChannel.ArchiveErrorTask, () => {}, taskId)
+  }
+
+  newTasks(project: Project, pageIds: string[]): Promise<void> {
+    return this.createHandler(C2MChannel.NewTasks, () => {}, project, pageIds)
   }
 
   private createHandler<T>(

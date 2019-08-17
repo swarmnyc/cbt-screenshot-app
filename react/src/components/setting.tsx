@@ -1,5 +1,5 @@
-import { AppBar, Box, Button, IconButton, NativeSelect, Toolbar, Typography } from "@material-ui/core"
-import { KeyboardBackspace, Delete, Add } from "@material-ui/icons"
+import { AppBar, Button, IconButton, NativeSelect, Toolbar, Typography } from "@material-ui/core"
+import { Add, Delete, KeyboardBackspace } from "@material-ui/icons"
 import { Project } from "cbt-screenshot-common"
 import React from "react"
 import { RouteComponentProps } from "react-router-dom"
@@ -35,15 +35,10 @@ export default class Setting extends React.Component<RouteComponentProps, State>
               <KeyboardBackspace />
             </IconButton>
 
-            <Typography>Settings</Typography>
-          </Toolbar>
-        </AppBar>
-        <Box className="m-2">
-          <Box style={{ display: "flex", alignItems: "center" }}>
-            <Typography variant="h6" className="mx-2">
-              Project:
-            </Typography>
-            <NativeSelect value={projectId} onChange={this.onProjectSelected}>
+            <Typography className="flex-grow">Settings</Typography>
+
+            <Typography className="mx-2">Project:</Typography>
+            <NativeSelect className="light" value={projectId} onChange={this.onProjectSelected}>
               {projects.length === 0 && <option>No Project</option>}
               {projects.map(p => (
                 <option key={p._id} value={p._id}>
@@ -51,21 +46,20 @@ export default class Setting extends React.Component<RouteComponentProps, State>
                 </option>
               ))}
             </NativeSelect>
-            <Button variant="contained" className="m-2" onClick={this.addProject}>
+
+            <Button variant="contained" className="m-2" color="default" onClick={this.addProject}>
               <Add className="mr-1" />
               Add
             </Button>
 
             {projectId && (
-              <>
-                <Button variant="contained" color="secondary" onClick={this.deleteProject}>
-                  <Delete className="mr-1" />
-                  Delete
-                </Button>
-              </>
+              <Button className="mr-3" variant="contained" color="default" onClick={this.deleteProject}>
+                <Delete className="mr-1" />
+                Delete
+              </Button>
             )}
-          </Box>
-        </Box>
+          </Toolbar>
+        </AppBar>
         {projectId && this.renderProject()}
       </>
     )

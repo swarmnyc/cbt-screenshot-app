@@ -2,20 +2,28 @@ export declare type ObjectId = any
 
 /** Client to Main channels */
 export enum C2MChannel {
+  Initialize = "Initialize",
+
+  CreateProject = "CreateProject",
+  DeleteProject = "DeleteProject",
+  UpdateProjectProperty = "UpdateProjectProperty",
+
   BulkEditPages = "BulkEditPages",
   CreatePage = "CreatePage",
-  CreateProject = "CreateProject",
   DeletePage = "DeletePage",
-  DeleteProject = "DeleteProject",
-  Initialize = "Initialize",
   UpdatePageProperty = "UpdatePageProperty",
-  UpdateProjectProperty = "UpdateProjectProperty"
+
+  ArchiveErrorTask = "ArchiveErrorTask",
+  GetTasks = "GetTasks",
+  NewTasks = "NewTasks",
+  CancelTask = "CancelTask",
 }
 
 /** Main to Client channels */
 export enum M2CChannel {
   ChangeConnection = "ChangeConnection",
-  OpenSettings = "OpenSettings"
+  OpenSettings = "OpenSettings",
+  OpenTasks = "OpenTasks"
 }
 
 export enum LoadStatus {
@@ -30,19 +38,26 @@ export enum InitStatus {
   error
 }
 
-export interface Project {
-  _id: ObjectId | string
-  name: string
-  domain: string
-  authName: string
-  authPassword: string
-  authKey: string
-  desktopBrowsers: string[]
-  mobileBrowsers: string[]
+export interface AwsSqsConfig {
+  awsKey?: string
+  awsKeySecret?: string
+  awsRegion?: string
+  awsSqsUrl?: string
+}
+
+export interface Project extends AwsSqsConfig {
+  _id?: ObjectId | string
+  name?: string
+  domain?: string
+  authName?: string
+  authPassword?: string
+  authKey?: string
+  desktopBrowsers?: string[]
+  mobileBrowsers?: string[]
 }
 
 export interface Page {
-  _id: ObjectId | string
+  _id?: ObjectId | string
   projectId?: ObjectId | string
   name?: string
   path?: string
@@ -52,12 +67,12 @@ export interface Page {
 }
 
 export interface Task {
-  _id: ObjectId | string
-  projectId: ObjectId | string
-  pageId: ObjectId | string
-  state: TaskState
-  type: TaskType
-  createdAt: Date
+  _id?: ObjectId | string
+  projectId?: ObjectId | string
+  pageId?: ObjectId | string
+  state?: TaskState
+  type?: TaskType
+  createdAt?: Date
   executedAt?: Date
   finishedAt?: Date
 }
@@ -72,7 +87,8 @@ export enum TaskState {
   Executing = "Executing",
   Executed = "Executed",
   Canceled = "Canceled",
-  Error = "Error"
+  Error = "Error",
+  ErrorArchived = "ErrorArchived"
 }
 
 export enum TaskType {

@@ -10,8 +10,8 @@ class Navigator {
     this.history.replace("/settings")
   }
 
-  openScreenshots = (): void => {
-    this.history.replace("/screenshots")
+  openTasks = (): void => {
+    this.history.replace("/tasks")
   }
 }
 
