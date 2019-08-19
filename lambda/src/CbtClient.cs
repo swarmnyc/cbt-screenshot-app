@@ -56,20 +56,20 @@ namespace CbtScreenshotTask {
 
       var tryCount = 0;
 
-      Logger.Log($"Taking Screenshot of {targetUrl}");
+      Logger.Log($"Taking {task.Type} Screenshot of {targetUrl}");
 
     START:
       HttpResponseMessage res = await client.PostAsync(apiUri, content);
 
       if (tryCount > 3) {
-        Logger.Log($"Cannot take screenshot of {targetUrl}");
+        Logger.Log($"Taking {task.Type} Screenshot of {targetUrl} stopped by retry 3 times");
 
         return null;
       }
 
       if (res.StatusCode != HttpStatusCode.OK) {
         var error = await res.Content.ReadAsStringAsync();
-        Logger.Log($"Resquest Failed for {targetUrl}, {error}");
+        Logger.Log($"Taking {task.Type} Screenshot of {targetUrl} failed, {error}");
 
         Thread.Sleep(10_000);
         tryCount++;
@@ -87,7 +87,7 @@ namespace CbtScreenshotTask {
       CbtScreenshot info = await GetScreenshotInfo(result.screenshot_test_id.ToString());
 
       if (info.versions.First().active) {
-        Logger.Log($"Task is still running.");
+        Logger.Log($"{result.url} is still running.");
 
         Thread.Sleep(90_000);
         goto START;
