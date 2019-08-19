@@ -1,6 +1,8 @@
 ﻿using Amazon.Lambda.Core;
-using Amazon.SQS;
+using Amazon.Lambda;
 using System.Threading.Tasks;
+using Amazon.Lambda.Model;
+using Amazon;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -47,9 +49,14 @@ namespace CbtScreenshotTask {
 
         if (await dbClient.HasPendingTask()) {
           // trigger next one
-          var sqsClient = new AmazonSQSClient(project.AwsKey, project.AwsKeySecret);
+          var lambdaClient = new AmazonLambdaClient(project.AwsKey, project.AwsKeySecret, RegionEndpoint.GetBySystemName(project.AwsRegion));
 
-          await sqsClient.SendMessageAsync(project.AwsSqsUrl, "trigger next one");
+          var lambdaRequest = new InvokeRequest() {
+            FunctionName = "cbt-screenshot-task",
+            InvocationType = InvocationType.Event
+          };
+
+          await lambdaClient.InvokeAsync(lambdaRequest);
 
           Logger.Log($"Next One triggered.");
         }

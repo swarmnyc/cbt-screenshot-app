@@ -89,7 +89,7 @@ namespace CbtScreenshotTask {
       if (info.versions.First().active) {
         Logger.Log($"Task is still running.");
 
-        Thread.Sleep(60_000);
+        Thread.Sleep(90_000);
         goto START;
       }
     }

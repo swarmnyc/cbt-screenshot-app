@@ -38,14 +38,13 @@ export enum InitStatus {
   error
 }
 
-export interface AwsSqsConfig {
+export interface AwsConfig {
   awsKey?: string
   awsKeySecret?: string
   awsRegion?: string
-  awsSqsUrl?: string
 }
 
-export interface Project extends AwsSqsConfig {
+export interface Project extends AwsConfig {
   _id?: ObjectId | string
   name?: string
   domain?: string

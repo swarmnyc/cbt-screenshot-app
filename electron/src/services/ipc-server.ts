@@ -1,7 +1,7 @@
 import { C2MChannel, Page, InitializeResult, Project } from "cbt-screenshot-common"
 import { ipcMain, BrowserWindow, Event } from "electron"
 import dbClient from "./db-client"
-import { SqsClient } from "./sqs-client"
+import { AwsClient } from "./aws-client"
 
 export class IpcServer {
   constructor(private window: BrowserWindow) {
@@ -71,9 +71,9 @@ export class IpcServer {
       await dbClient.newTasks(project, pageIds)
 
       if (!(await dbClient.hasExecutingTask())) {
-        var sqsClient = new SqsClient(project)
+        var awsClient = new AwsClient(project)
 
-        await sqsClient.send("trigger lambda")
+        await awsClient.invokeNewLambda()
       }
     })
   }

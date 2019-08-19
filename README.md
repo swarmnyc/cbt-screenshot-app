@@ -3,11 +3,10 @@
 The repo is an Electron app that using CrossBrowserTesting API to do batch screenshots and display the results.
 
 ## App dependencies
-This app needs 4 services
+This app needs 3 services
 1. A CrossBrowserTesting Unlimited Account
 2. A Mongo DB: for save configs. The db can be remote host or local host.
-3. AWS SQS: for trigger AWS Lambda
-4. AWS Lambda: for Call CrossBrowserTesting API to take screenshots
+3. AWS Lambda: a Serverless back-end task runner for calling CrossBrowserTesting API to take screenshots
 
 ## Development
 There are 4 projects includes

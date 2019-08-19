@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.5.0" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.3.100" />
+    <PackageReference Include="AWSSDK.Lambda" Version="3.3.102" />
     <PackageReference Include="Flurl" Version="2.8.2" />
     <PackageReference Include="MongoDB.Driver" Version="2.8.1" />
   </ItemGroup>

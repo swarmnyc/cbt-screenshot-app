@@ -103,15 +103,6 @@ export default class SettingConfig extends React.Component<Props, State> {
           />
 
           <TextField
-            id="project-awsSqsUrl"
-            label="AWS SQS Url"
-            className="mt-3"
-            fullWidth
-            defaultValue={project.awsSqsUrl}
-            onBlur={this.onConfigChanged}
-          />
-
-          <TextField
             id="project-mobileBrowsers"
             label="CBT Mobile Browsers"
             className="mt-3"
