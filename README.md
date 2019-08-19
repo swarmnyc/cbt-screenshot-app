@@ -5,11 +5,11 @@ The repo is an Electron app that using CrossBrowserTesting API to do batch scree
 ## App dependencies
 This app needs 3 services
 1. A CrossBrowserTesting Unlimited Account
-2. A Mongo DB: for save configs. The db can be remote host or local host.
-3. AWS Lambda: a Serverless back-end task runner for calling CrossBrowserTesting API to take screenshots
+2. A Mongo DB: for save configs. The db can a be remote host from [mLab](https://mlab.com) or [mongodb cloud](https://cloud.mongodb.com) or a local host.
+3. AWS Lambda: a serverless function for calling CrossBrowserTesting API to take screenshots
 
 ## Development
-There are 4 projects includes
+This repository includes 4 projects:
 1. common: shared code for electron and react
 2. react: the UI APP
 3. electron: the wrapper of the UI APP 
@@ -32,7 +32,7 @@ $ cd electron
 $ npm run start
 ```
 
-Number 4 is written in C# and it is for AWS Lambda. It can be only executed by AWS Lambda.
+Number 4 project is written in C# with .Net Core 2.1 and it is for AWS Lambda. It can be only executed by AWS Lambda.
 
 ## Deploy
 The client app is deploy to GitHub Release. Our CI server will be triggered by git Tag Push and automatically push files to Github.
@@ -54,12 +54,10 @@ $ npm run build
 
 For lambda project, run these command to deploy to AWS Lambda
 ``` bash
-dotnet tool install -g Amazon.Lambda.Tools # for first time
-dotnet lambda deploy-function cbt-screenshot-task # to upload files
+$ dotnet tool install -g Amazon.Lambda.Tools # for first time
+$ dotnet lambda deploy-function cbt-screenshot-task # to upload the zip file
 ```
-
-### Note
-your machine must have a "swarm" profile in your ~/.aws/credentials and ~/.aws/configs for deployment.
+> your machine must have a "swarm" profile in your ~/.aws/credentials and ~/.aws/configs for deployment or use **--profile** to give a specific profile.
 
 ## App Demo Images
 ### Home Screen
@@ -67,3 +65,66 @@ your machine must have a "swarm" profile in your ~/.aws/credentials and ~/.aws/c
 
 ### Setting Screen
 ![setting screen](./images/setting-screen.png)
+
+## Setup Database
+The mongo database doesn't need to be set up, you just need to pass the connection string to the client app and lambda.
+
+You can use docker to start a local mongodb
+``` bash
+$ docker run -p 27017:27017 mongo
+```
+so the connection string is **mongodb://localhost:27017/csa** and the db name is **csa**
+
+## Setup AWS Lambda
+To setup the AWS Lambda, you need
+1. create a Aws lambda with name called **"cbt-screenshot-task"**
+2. the execution role needs **Lambda Invoke** permissions and **CloudWatchLog Write** permissions, the policy is like
+``` JSON
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "lambda:InvokeFunction",
+                "lambda:InvokeAsync",
+                "logs:CreateLogGroup",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+3. put Environment variables for "DB_CONNECTION_STRING" and "DB_NAME"
+4. create a AWS User on IAM for the APP, the permission needs
+``` JSON
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "lambda:InvokeFunction",
+                "lambda:InvokeAsync"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+5. then put the AWS Access Key Id and AWS Access Key Secret via the client App on Setting Screen.
+
+## Development Nodes
+1. Because CrossBrowserTesting doesn't have batch executing screenshots, so we create this app to do that.
+2. The app has a better list of pages to view the screenshot results than the original UI of CrossBrowserTesting
+3. The app supports quickly switching projects(websites)
+4. The database structure is
+- project: store configs and pages
+- pages: store the information of pages
+- tasks: store the information of tasks
+5. The workflow is
+- when you select pages to take screenshots, the app store the information into tasks collection.
+- invoke AWS Lambda and the function will call CrossBrowserTesting API to take screenshots based on tasks collection.
+- the app save the results in pages collection, so you can view the result via the app.
