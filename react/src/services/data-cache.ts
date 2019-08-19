@@ -52,6 +52,40 @@ class DataCache {
     this.projectPageMap.set(page.projectId, this.pageArray.filter(p => p.projectId === page.projectId))
   }
 
+  getPagesByFolders(project: Project, search?: string): Map<string, Page[]> {
+    var pages = this.projectPageMap.get(project._id)
+    var map = new Map<string, Page[]>()
+
+    if (search) {
+      pages = pages.filter(p => {
+        var target = `${p.path}|${p.name}`.toLowerCase()
+        return target.includes(search)
+      })
+    }
+
+    pages = pages.sort((a, b) => {
+      if (a.folder > b.folder) {
+        return 1
+      } else if (a.folder < b.folder) {
+        return -1
+      } else {
+        return 0
+      }
+    })
+
+    pages.forEach(page => {
+      var folder = page.folder ? page.folder : "Undefined"
+
+      if (map.has(folder)) {
+        map.get(folder).push(page)
+      } else {
+        map.set(folder, [page])
+      }
+    })
+
+    return map
+  }
+
   get hasNoProject(): boolean {
     return this.projectArray.length === 0
   }
