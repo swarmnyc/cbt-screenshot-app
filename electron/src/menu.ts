@@ -9,20 +9,20 @@ const template: (MenuItemConstructorOptions | MenuItem)[] = [
     submenu: [
       {
         label: "Open Settings",
-        click(menuItem: MenuItem, currentWindow: BrowserWindow) {
+        click(_: MenuItem, currentWindow: BrowserWindow) {
           currentWindow.webContents.send(M2CChannel.OpenSettings)
         }
       },
       {
         label: "Open Tasks",
-        click(menuItem: MenuItem, currentWindow: BrowserWindow) {
+        click(_: MenuItem, currentWindow: BrowserWindow) {
           currentWindow.webContents.send(M2CChannel.OpenTasks)
         }
       },
       { type: "separator" },
       {
         label: "Change Connection",
-        click(menuItem: MenuItem, currentWindow: BrowserWindow) {
+        click(_: MenuItem, currentWindow: BrowserWindow) {
           currentWindow.webContents.send(M2CChannel.ChangeConnection)
         }
       },

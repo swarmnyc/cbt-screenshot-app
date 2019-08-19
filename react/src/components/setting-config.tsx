@@ -94,7 +94,7 @@ export default class SettingConfig extends React.Component<Props, State> {
           />
 
           <TextField
-            id="project-awsKeySecret"
+            id="project-awsRegion"
             label="AWS Region"
             className="mt-3"
             fullWidth

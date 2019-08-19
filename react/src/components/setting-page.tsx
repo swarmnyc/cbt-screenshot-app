@@ -348,7 +348,7 @@ export default class SettingPage extends React.Component<Props, State> {
 
     this.setState({
       pages,
-      selectedPages: isSelected ? pages.length : 0,
+      selectedPages: isSelected ? pages.length - 1 : 0,
       isPartialSelected: false,
       isAllSelected: isSelected
     })

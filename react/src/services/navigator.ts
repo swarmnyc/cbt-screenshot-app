@@ -1,7 +1,7 @@
-import { createBrowserHistory, History } from "history"
+import { createHashHistory, History } from "history"
 
 class Navigator {
-  history: History = createBrowserHistory()
+  history: History = createHashHistory()
   openHome = (): void => {
     this.history.replace("/home")
   }
