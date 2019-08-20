@@ -71,6 +71,7 @@ export interface Task {
   pageId?: ObjectId | string
   state?: TaskState
   type?: TaskType
+  reason?: string
   createdAt?: Date
   executedAt?: Date
   finishedAt?: Date

@@ -4,8 +4,10 @@ import MuiExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails"
 import MuiExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary"
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
 import { Page, Project } from "cbt-screenshot-common"
+import Noty from "noty"
 import React from "react"
 import dataCache from "services/data-cache"
+import ipcClient from "services/ipc-client"
 import SearchBox from "./search-box"
 
 const ExpansionPanel = withStyles({
@@ -44,6 +46,7 @@ const ExpansionPanelSummary = withStyles({
     }
   },
   content: {
+    display: "block",
     "&$expanded": {
       margin: "8px 0"
     }
@@ -53,6 +56,7 @@ const ExpansionPanelSummary = withStyles({
 
 const ExpansionPanelDetails = withStyles({
   root: {
+    display: "block",
     padding: 0
   }
 })(MuiExpansionPanelDetails)
@@ -80,7 +84,7 @@ export default class HomeLeft extends React.Component<Props, State> {
       comps.push(
         <ExpansionPanel key={folder}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>{folder}</Typography>
+            <Typography onContextMenu={e => this.showFolderContextMenu(pages)}>{folder}</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <List dense>
@@ -91,6 +95,7 @@ export default class HomeLeft extends React.Component<Props, State> {
                   onClick={() => {
                     this.props.onPageSelected(page)
                   }}
+                  onContextMenu={e => this.showPageContextMenu(page)}
                 >
                   <ListItemText primary={page.name} title={page.path} />
                 </ListItem>
@@ -103,7 +108,7 @@ export default class HomeLeft extends React.Component<Props, State> {
 
     return (
       <div className="home-left-container">
-        <SearchBox onChanged={this.search} className="borderless"/>
+        <SearchBox onChanged={this.search} className="borderless" />
         {comps}
       </div>
     )
@@ -111,5 +116,43 @@ export default class HomeLeft extends React.Component<Props, State> {
 
   private search = (search: string) => {
     this.setState({ pages: dataCache.getPagesByFolders(this.props.project, search.toLowerCase()) })
+  }
+
+  private showFolderContextMenu = (pages: Page[]) => {
+    var { Menu, MenuItem } = window.electron.remote
+    const menu = new Menu()
+    menu.append(
+      new MenuItem({
+        label: "Take Screenshots of this folder",
+        click: () => {
+          ipcClient.newTasks(this.props.project, pages.map(p => p._id)).then(() => this.showSuccessMessage(false))
+        }
+      })
+    )
+    menu.popup()
+  }
+
+  private showPageContextMenu = (page: Page) => {
+    var { Menu, MenuItem } = window.electron.remote
+    const menu = new Menu()
+    menu.append(
+      new MenuItem({
+        label: "Take Screenshot",
+        click: () => {
+          ipcClient.newTasks(this.props.project, [page._id]).then(() => this.showSuccessMessage(true))
+        }
+      })
+    )
+    menu.popup()
+  }
+
+  private showSuccessMessage(single: boolean) {
+    new Noty({
+      theme: "nest",
+      type: "success",
+      layout: "topRight",
+      timeout: 2000,
+      text: single ? "Task Created" : "Tasks Created"
+    }).show()
   }
 }

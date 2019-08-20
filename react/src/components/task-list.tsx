@@ -117,7 +117,7 @@ export default class TaskList extends React.Component<RouteComponentProps, State
                       </TableCell>
                       <TableCell align="left">
                         <TimeAgo date={task.executedAt} />
-                      </TableCell>                      
+                      </TableCell>
                     </TableRow>
                   )
                 })}
@@ -166,7 +166,7 @@ export default class TaskList extends React.Component<RouteComponentProps, State
                         <TimeAgo date={task.createdAt} />
                       </TableCell>
                       <TableCell align="right">
-                      <IconButton
+                        <IconButton
                           id={"task-" + task._id + "-pending"}
                           title="Cancel"
                           size="small"
@@ -208,6 +208,7 @@ export default class TaskList extends React.Component<RouteComponentProps, State
                   <TableCell align="left">Type</TableCell>
                   <TableCell align="left">Queued At</TableCell>
                   <TableCell align="left">Failed At</TableCell>
+                  <TableCell align="left">Reason</TableCell>
                   <TableCell style={{ width: "50px" }}></TableCell>
                 </TableRow>
               </TableHead>
@@ -225,6 +226,11 @@ export default class TaskList extends React.Component<RouteComponentProps, State
                       </TableCell>
                       <TableCell align="left">
                         <TimeAgo date={task.finishedAt} />
+                      </TableCell>
+                      <TableCell align="left">
+                        <Typography title={task.reason}>
+                          {task.reason && task.reason.length > 10 ? task.reason.substring(0, 10) + "..." : task.reason}
+                        </Typography>
                       </TableCell>
                       <TableCell align="right">
                         <IconButton
