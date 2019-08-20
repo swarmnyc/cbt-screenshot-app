@@ -16,7 +16,7 @@ namespace CbtScreenshotTask {
         var dbClient = new DbClient();
         if (await dbClient.CheckHasExecutingTasks()) {
           // only one task as one time
-          Logger.Log("There is a task still in progress.");
+          Logger.Log("There is a task still in progress, stop this lambda.");
 
           return;
         }
@@ -28,6 +28,8 @@ namespace CbtScreenshotTask {
           return;
         }
 
+        Logger.TaskId = task.Id.ToString();
+
         var project = await dbClient.GetProject(task.ProjectId);
         var page = await dbClient.GetPage(task.PageId);
 
@@ -36,15 +38,15 @@ namespace CbtScreenshotTask {
         var result = await cbtClient.TakeScreenshot(task);
 
         if (result == null) {
-          await dbClient.MakeTaskError(task);
+          await dbClient.MakeTaskError(task, cbtClient.LastError);
         } else {
-          Logger.Log($"Screenshot ResultId: {result.screenshot_test_id}.");
+          Logger.Log($"Screenshot resultId: {result.screenshot_test_id}.");
 
           await cbtClient.WaitForScreenshotDone(result);
 
           await dbClient.UpdatePageAndTaskResult(page, task, result);
 
-          Logger.Log($"Screenshot {result.screenshot_test_id} is done.");
+          Logger.Log($"Task succeeded.");
         }
 
         if (await dbClient.HasPendingTask()) {
@@ -58,7 +60,7 @@ namespace CbtScreenshotTask {
 
           await lambdaClient.InvokeAsync(lambdaRequest);
 
-          Logger.Log($"Next One triggered.");
+          Logger.Log($"New lambda invoked.");
         }
       } catch (System.Exception ex) {
         Logger.Log("Error: " + ex.ToString());

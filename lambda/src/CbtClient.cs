@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 namespace CbtScreenshotTask {
   class CbtClient {
     readonly static string CbtAPIBaseUri = "https://crossbrowsertesting.com/api/v3/screenshots";
-
     private AppProject project;
     private AppPage page;
     private HttpClient client;
+    public string LastError { get; internal set; }
 
     public CbtClient(AppProject project, AppPage page) {
       this.project = project;
@@ -55,21 +55,21 @@ namespace CbtScreenshotTask {
       content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
 
       var tryCount = 0;
-
-      Logger.Log($"Taking {task.Type} Screenshot of {targetUrl}");
+      LastError = null;
+      Logger.Log($"Start taking {task.Type} screenshot of {targetUrl}");
 
     START:
       HttpResponseMessage res = await client.PostAsync(apiUri, content);
 
       if (tryCount > 3) {
-        Logger.Log($"Taking {task.Type} Screenshot of {targetUrl} stopped by retry 3 times");
+        Logger.Log($"Stop {task.Type} screenshot of {targetUrl} by retry 3 times");
 
         return null;
       }
 
       if (res.StatusCode != HttpStatusCode.OK) {
-        var error = await res.Content.ReadAsStringAsync();
-        Logger.Log($"Taking {task.Type} Screenshot of {targetUrl} failed, {error}");
+        LastError = await res.Content.ReadAsStringAsync();
+        Logger.Log($"{task.Type} screenshot of {targetUrl} failed, Error: {LastError}");
 
         Thread.Sleep(10_000);
         tryCount++;

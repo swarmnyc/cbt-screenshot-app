@@ -37,6 +37,9 @@ namespace CbtScreenshotTask
     [BsonElement("state"), BsonRepresentation(BsonType.String)]
     public AppTaskState State { get; set; }
 
+    [BsonElement("reason")]
+    public string Reason { get; set; }
+
     [BsonElement("createdAt")]
     public DateTime CreatedAt { get; set; }
 

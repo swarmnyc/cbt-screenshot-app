@@ -44,21 +44,22 @@ namespace CbtScreenshotTask {
         // check if tasks if or not have problem
         var problemList = new List<AppTask>();
 
-        result.ForEach((t) => {
-          var diff = DateTime.UtcNow - result[0].ExecutedAt.Value;
+        foreach (var task in result.ToArray()) {
+          var diff = DateTime.UtcNow - task.ExecutedAt.Value;
 
-          if (diff.Minutes > 15) {
-            // if more than 15 min, then the task might have problem, so remove it.
-            result.Remove(t);
-            problemList.Add(t);
+          if (diff.Minutes > 9) {
+            // if more than 9 min, then the task might have problem, so remove it.
+            result.Remove(task);
+            problemList.Add(task);
           }
-        });
+        }
 
         if (problemList.Count > 0) {
           var tasks = problemList.Select((t) => {
             var filter = Builders<AppTask>.Filter.Eq(d => d.Id, t.Id);
             var update = Builders<AppTask>.Update.Set(d => d.State, AppTaskState.Error)
-              .Set(d => d.FinishedAt, DateTime.UtcNow);
+              .Set(d => d.FinishedAt, DateTime.UtcNow)
+              .Set(d => d.Reason, "Timeout");
 
             return taskCollection.UpdateOneAsync(filter, update);
           });
@@ -126,10 +127,11 @@ namespace CbtScreenshotTask {
       await taskCollection.UpdateOneAsync(filter, update);
     }
 
-    public Task MakeTaskError(AppTask task) {
+    public Task MakeTaskError(AppTask task, string reason) {
       var filter = Builders<AppTask>.Filter.Eq(d => d.Id, task.Id);
       var update = Builders<AppTask>.Update.Set(d => d.State, AppTaskState.Error)
-        .Set(d => d.FinishedAt, DateTime.UtcNow);
+        .Set(d => d.FinishedAt, DateTime.UtcNow)
+        .Set(d => d.Reason, reason);
 
       return taskCollection.UpdateOneAsync(filter, update);
     }
