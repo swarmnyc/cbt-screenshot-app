@@ -22,7 +22,7 @@ export default class SearchBox extends Component<Props, State> {
     super(props)
 
     this.debounceOnChanged = debounce(this.props.onChanged, 1000)
-    this.state = { value: this.props.value }
+    this.state = { value: this.props.value || "" }
   }
 
   render() {
@@ -39,7 +39,7 @@ export default class SearchBox extends Component<Props, State> {
             input: "search-box-input"
           }}
           onChange={this.onChanged}
-          defaultValue={value}
+          value={value}
         />
         {value && (
           <IconButton className="search-box-cancel-icon" onClick={this.cancel}>
