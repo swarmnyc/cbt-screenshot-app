@@ -9,6 +9,7 @@ import dataCache from "../services/data-cache"
 import navigator from "../services/navigator"
 import SettingConfig from "./setting-config"
 import SettingPage from "./setting-page"
+import settingService from "services/setting-service"
 
 interface State {
   project?: Project
@@ -20,7 +21,11 @@ export default class Setting extends React.Component<RouteComponentProps, State>
   constructor(props: RouteComponentProps) {
     super(props)
 
-    this.state = { project: dataCache.projectArray[0] }
+    var project = dataCache.projectMap.get(settingService.getLastSelectProjectId())
+    if (project == null) {
+      project = dataCache.projectArray[0]
+    }
+    this.state = { project }
   }
 
   render(): React.ReactElement {
@@ -92,7 +97,9 @@ export default class Setting extends React.Component<RouteComponentProps, State>
   }
 
   private onProjectSelected = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    this.setState({ project: dataCache.projectMap.get(event.target.value) })
+    var project = dataCache.projectMap.get(event.target.value)
+    settingService.setLastSelectProjectId(project._id)
+    this.setState({ project })
   }
 
   private deleteProject = () => {

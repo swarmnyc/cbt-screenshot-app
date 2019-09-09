@@ -21,7 +21,6 @@ import navigator from "../services/navigator"
 import ipcClient from "services/ipc-client"
 
 interface State {
-  project: Project
   executingTasks: Task[]
   pendingTasks: Task[]
   errorTasks: Task[]
@@ -32,7 +31,6 @@ export default class TaskList extends React.Component<RouteComponentProps, State
     super(props)
 
     this.state = {
-      project: dataCache.projectArray[0],
       executingTasks: [],
       pendingTasks: [],
       errorTasks: []
@@ -45,8 +43,6 @@ export default class TaskList extends React.Component<RouteComponentProps, State
 
   render(): React.ReactElement {
     var projects = dataCache.projectArray
-    var { project } = this.state
-    var projectId: string = project ? project._id : ""
 
     return (
       <>
@@ -58,25 +54,15 @@ export default class TaskList extends React.Component<RouteComponentProps, State
 
             <Typography className="flex-grow">Tasks</Typography>
 
-            <Typography className="mx-2">Project:</Typography>
-            <NativeSelect className="light" value={projectId} onChange={this.onProjectSelected}>
-              {projects.map(p => (
-                <option key={p._id} value={p._id}>
-                  {p.name}
-                </option>
-              ))}
-            </NativeSelect>
-
             <IconButton title="Refresh" color="inherit" onClick={this.fetchTasks}>
               <Refresh />
             </IconButton>
           </Toolbar>
         </AppBar>
-        <React.Fragment key={project._id}>
-          {this.renderExecuting()}
-          {this.renderPending()}
-          {this.renderError()}
-        </React.Fragment>
+
+        {this.renderExecuting()}
+        {this.renderPending()}
+        {this.renderError()}
       </>
     )
   }
@@ -97,6 +83,7 @@ export default class TaskList extends React.Component<RouteComponentProps, State
                   <TableCell align="right" style={{ width: "67px" }}>
                     NO.
                   </TableCell>
+                  <TableCell align="left">Project</TableCell>
                   <TableCell align="left">Path</TableCell>
                   <TableCell align="left">Type</TableCell>
                   <TableCell align="left">Queued At</TableCell>
@@ -106,10 +93,12 @@ export default class TaskList extends React.Component<RouteComponentProps, State
               <TableBody>
                 {tasks.map((task, index) => {
                   var page = dataCache.pageMap.get(task.pageId)
+                  var project = dataCache.projectMap.get(task.projectId)
 
                   return (
                     <TableRow key={task._id}>
                       <TableCell align="right">{index + 1}</TableCell>
+                      <TableCell align="left">{project ? project.name : "Deleted"}</TableCell>
                       <TableCell align="left">{page ? page.path : "Deleted"}</TableCell>
                       <TableCell align="left">{task.type}</TableCell>
                       <TableCell align="left">
@@ -147,6 +136,7 @@ export default class TaskList extends React.Component<RouteComponentProps, State
                   <TableCell align="right" style={{ width: "67px" }}>
                     NO.
                   </TableCell>
+                  <TableCell align="left">Project</TableCell>
                   <TableCell align="left">Path</TableCell>
                   <TableCell align="left">Type</TableCell>
                   <TableCell align="left">Queued At</TableCell>
@@ -156,10 +146,12 @@ export default class TaskList extends React.Component<RouteComponentProps, State
               <TableBody>
                 {tasks.map((task, index) => {
                   var page = dataCache.pageMap.get(task.pageId)
+                  var project = dataCache.projectMap.get(task.projectId)
 
                   return (
                     <TableRow key={task._id}>
                       <TableCell align="right">{index + 1}</TableCell>
+                      <TableCell align="left">{project ? project.name : "Deleted"}</TableCell>
                       <TableCell align="left">{page ? page.path : "Deleted"}</TableCell>
                       <TableCell align="left">{task.type}</TableCell>
                       <TableCell align="left">
@@ -204,6 +196,7 @@ export default class TaskList extends React.Component<RouteComponentProps, State
                   <TableCell align="right" style={{ width: "67px" }}>
                     NO.
                   </TableCell>
+                  <TableCell align="left">Project</TableCell>
                   <TableCell align="left">Path</TableCell>
                   <TableCell align="left">Type</TableCell>
                   <TableCell align="left">Queued At</TableCell>
@@ -215,10 +208,12 @@ export default class TaskList extends React.Component<RouteComponentProps, State
               <TableBody>
                 {tasks.map((task, index) => {
                   var page = dataCache.pageMap.get(task.pageId)
+                  var project = dataCache.projectMap.get(task.projectId)
 
                   return (
                     <TableRow key={task._id}>
                       <TableCell align="right">{index + 1}</TableCell>
+                      <TableCell align="left">{project ? project.name : "Deleted"}</TableCell>
                       <TableCell align="left">{page ? page.path : "Deleted"}</TableCell>
                       <TableCell align="left">{task.type}</TableCell>
                       <TableCell align="left">
@@ -253,10 +248,6 @@ export default class TaskList extends React.Component<RouteComponentProps, State
         </Paper>
       </>
     )
-  }
-
-  private onProjectSelected = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    this.setState({ project: dataCache.projectMap.get(event.target.value) })
   }
 
   private cancelTask = (event: React.MouseEvent<HTMLButtonElement>) => {

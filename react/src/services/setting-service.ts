@@ -1,6 +1,14 @@
 import Swal from "sweetalert2"
 
 class SettingService {
+  getLastSelectProjectId(): string {
+    return localStorage["LastSelectProjectId"]
+  }
+
+  setLastSelectProjectId(projectId: string): void {
+    localStorage["LastSelectProjectId"] = projectId
+  }
+
   getDbConnectionString(): Promise<string> {
     var connStr = localStorage.getItem("DbConnectionString")
     if (connStr) {

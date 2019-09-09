@@ -6,6 +6,7 @@ import SplitPane from "react-split-pane"
 import dataCache from "../services/data-cache"
 import HomeLeft from "./home-left"
 import HomeRight from "./home-right"
+import settingService from "services/setting-service"
 
 interface State {
   project?: Project
@@ -20,7 +21,12 @@ export default class Home extends React.Component<{}, State> {
   constructor(props: {}) {
     super(props)
 
-    this.state = { project: dataCache.projectArray[0], mobileMode: true }
+    var project = dataCache.projectMap.get(settingService.getLastSelectProjectId())
+    if (project == null) {
+      project = dataCache.projectArray[0]
+    }
+
+    this.state = { project, mobileMode: true }
   }
 
   render(): React.ReactElement {
@@ -56,7 +62,14 @@ export default class Home extends React.Component<{}, State> {
             )}
           </Toolbar>
         </AppBar>
-        <SplitPane split="vertical" minSize={200} defaultSize={300} maxSize={500} style={{ height: "" }}>
+        <SplitPane
+          key={project._id}
+          split="vertical"
+          minSize={200}
+          defaultSize={300}
+          maxSize={500}
+          style={{ height: "" }}
+        >
           <HomeLeft project={project} onPageSelected={this.onPageSelected} />
           <HomeRight
             project={project}
@@ -70,7 +83,9 @@ export default class Home extends React.Component<{}, State> {
   }
 
   private onProjectSelected = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-    this.setState({ project: dataCache.projectMap.get(event.target.value), page: null })
+    var project = dataCache.projectMap.get(event.target.value)
+    settingService.setLastSelectProjectId(project._id)
+    this.setState({ project, page: null })
   }
 
   private onPageSelected = (page: Page): void => {
