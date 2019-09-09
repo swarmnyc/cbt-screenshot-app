@@ -1,7 +1,6 @@
 import {
   AppBar,
   IconButton,
-  NativeSelect,
   Paper,
   Table,
   TableBody,
@@ -12,13 +11,13 @@ import {
   Typography
 } from "@material-ui/core"
 import { Clear, KeyboardBackspace, Refresh, SaveAlt } from "@material-ui/icons"
-import { Project, Task, TaskState } from "cbt-screenshot-common"
+import { Task, TaskState } from "cbt-screenshot-common"
 import React from "react"
 import { RouteComponentProps } from "react-router-dom"
 import TimeAgo from "react-timeago"
+import ipcClient from "services/ipc-client"
 import dataCache from "../services/data-cache"
 import navigator from "../services/navigator"
-import ipcClient from "services/ipc-client"
 
 interface State {
   executingTasks: Task[]
@@ -42,8 +41,6 @@ export default class TaskList extends React.Component<RouteComponentProps, State
   }
 
   render(): React.ReactElement {
-    var projects = dataCache.projectArray
-
     return (
       <>
         <AppBar position="sticky">
